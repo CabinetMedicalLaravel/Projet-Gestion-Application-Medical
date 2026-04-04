@@ -1,0 +1,425 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* ── Login ── */
+.login-logo {
+    width: 38px; height: 38px; border-radius: 11px;
+    background: linear-gradient(135deg, #7F77DD, #534AB7);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1.5rem;
+}
+.login-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 25px; font-weight: 500; color: #111;
+    margin-bottom: .3rem; letter-spacing: -.3px;
+}
+.login-sub { font-size: 13px; color: #6b7280; margin-bottom: 1.75rem; }
+.login-alert {
+    background: #fef2f2; border: 0.5px solid #fca5a5;
+    border-radius: 10px; padding: .7rem 1rem;
+    font-size: 13px; color: #dc2626; margin-bottom: 1.2rem;
+}
+.login-field { margin-bottom: 1.2rem; }
+.login-label {
+    display: block; font-size: 11.5px; font-weight: 500;
+    letter-spacing: .4px; text-transform: uppercase;
+    color: #6b7280; margin-bottom: .45rem;
+}
+/* ⬇ C'est ici la clé : position relative sur le wrapper */
+.login-inp-wrap { position: relative; display: flex; align-items: center; }
+
+.login-ico {
+    position: absolute; left: 12px;
+    width: 15px; height: 15px;
+    opacity: .38; pointer-events: none;
+}
+.login-input {
+    width: 100%;
+    padding: .72rem 1rem .72rem 2.6rem; /* padding-left laisse place à l'icône */
+    background: #f9fafb;
+    border: 0.5px solid #e5e7eb;
+    border-radius: 10px; font-size: 14px;
+    color: #111; outline: none;
+    transition: border .18s, box-shadow .18s;
+}
+.login-input:focus {
+    border-color: #7F77DD;
+    box-shadow: 0 0 0 3px #7F77DD1a;
+}
+.login-eye {
+    position: absolute; right: 10px;
+    background: none; border: none; cursor: pointer;
+    padding: 4px; opacity: .38; transition: opacity .15s;
+    display: flex; align-items: center; color: #111;
+}
+.login-eye:hover { opacity: .7; }
+.login-err { display: block; font-size: 12px; color: #dc2626; margin-top: .3rem; }
+.login-row {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    margin: 1rem 0 1.5rem;
+}
+.login-chk {
+    display: flex; align-items: center; gap: .45rem;
+    font-size: 13px; color: #6b7280; cursor: pointer;
+}
+.login-chk input { width: 15px; height: 15px; accent-color: #7F77DD; }
+.login-fgt { font-size: 13px; color: #7F77DD; text-decoration: none; font-weight: 500; }
+.login-fgt:hover { opacity: .7; }
+.login-btn {
+    width: 100%; padding: .82rem; border-radius: 10px; border: none;
+    background: linear-gradient(135deg, #7F77DD, #534AB7);
+    color: #fff; font-size: 14.5px; font-weight: 500; cursor: pointer;
+    transition: transform .15s, box-shadow .15s;
+}
+.login-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px #7F77DD40; }
+
+.login-divider {
+    display: flex; align-items: center;
+    gap: .75rem; margin: 1.25rem 0;
+}
+.login-divider::before,
+.login-divider::after {
+    content: ''; flex: 1;
+    height: 0.5px; background: #e5e7eb;
+}
+.login-divider span {
+    font-size: 12px; color: #9ca3af; white-space: nowrap;
+}
+.login-btn-register {
+    display: block; width: 100%;
+    padding: .78rem; border-radius: 10px;
+    border: 0.5px solid #e5e7eb;
+    background: transparent;
+    color: #111; font-size: 14px; font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    text-align: center; text-decoration: none;
+    cursor: pointer; transition: background .15s, transform .15s;
+}
+.login-btn-register:hover {
+    background: #f9fafb;
+    transform: translateY(-1px);
+}
+.login-signup-link {
+    text-align: center; font-size: 12.5px;
+    color: #9ca3af; margin-top: 1.25rem;
+}
+.login-signup-link a {
+    color: #7F77DD; font-weight: 500; text-decoration: none;
+}
+.login-signup-link a:hover { opacity: .7; }
+
+
+/* ── Role selector ── */
+.role-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: .75rem; margin-bottom: 1.5rem;
+}
+.role-card {
+    border: 0.5px solid #e5e7eb; border-radius: 12px;
+    padding: .9rem .75rem; cursor: pointer;
+    transition: all .2s; text-align: center;
+    background: #f9fafb; user-select: none;
+}
+.role-card:hover { border-color: #7F77DD88; background: #fff; }
+.role-card.active {
+    border-color: #7F77DD; background: #7F77DD0d;
+    box-shadow: 0 0 0 3px #7F77DD1a;
+}
+.role-icon {
+    width: 36px; height: 36px; border-radius: 9px;
+    background: #fff; border: 0.5px solid #e5e7eb;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto .6rem; transition: all .2s;
+}
+.role-card.active .role-icon {
+    background: linear-gradient(135deg, #7F77DD, #534AB7);
+    border-color: transparent; color: white;
+}
+.role-name { font-size: 13px; font-weight: 500; color: #111; }
+.role-desc { font-size: 11px; color: #9ca3af; margin-top: .2rem; }
+
+/* ── Code d'accès ── */
+.code-box {
+    background: #7F77DD0a; border: 0.5px solid #7F77DD33;
+    border-radius: 12px; padding: 1rem;
+    margin-bottom: 1.1rem; display: none;
+}
+.code-box.visible {
+    display: block;
+    animation: fadeIn .3s ease;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.code-hint {
+    font-size: 11.5px; color: #7F77DD;
+    margin-bottom: .6rem; line-height: 1.5;
+}
+
+/* ── Colonnes mots de passe ── */
+.reg-cols {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: .75rem; margin-bottom: 0;
+}
+@media (max-width: 400px) { .reg-cols { grid-template-columns: 1fr; } }
+
+
+/* ================================================================
+   LOGIN / REGISTER — styles complets
+   À coller dans resources/css/app.css
+   ================================================================ */
+
+/* ── Carte principale ── */
+.login-logo {
+    width: 38px; height: 38px; border-radius: 11px;
+    background: linear-gradient(135deg, #7F77DD, #534AB7);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1.25rem;
+}
+
+.login-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 25px; font-weight: 500; color: #111;
+    margin-bottom: .3rem; letter-spacing: -.3px;
+}
+
+.login-sub {
+    font-size: 13px; color: #6b7280;
+    margin-bottom: 1.75rem;
+}
+
+.login-alert {
+    background: #fef2f2; border: 0.5px solid #fca5a5;
+    border-radius: 10px; padding: .7rem 1rem;
+    font-size: 13px; color: #dc2626; margin-bottom: 1.2rem;
+}
+
+/* ── Champs ── */
+.login-field { margin-bottom: 1.2rem; }
+
+.login-label {
+    display: block; font-size: 11.5px; font-weight: 500;
+    letter-spacing: .4px; text-transform: uppercase;
+    color: #6b7280; margin-bottom: .45rem;
+}
+
+.login-inp-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.login-ico {
+    position: absolute; left: 12px;
+    width: 15px; height: 15px;
+    opacity: .38; pointer-events: none;
+    z-index: 1;
+}
+
+.login-input {
+    width: 100%;
+    padding: .72rem 1rem .72rem 2.6rem;
+    background: #f9fafb;
+    border: 0.5px solid #e5e7eb;
+    border-radius: 10px; font-size: 13.5px;
+    color: #111; outline: none;
+    transition: border .18s, box-shadow .18s;
+    font-family: inherit;
+}
+
+.login-input:focus {
+    border-color: #7F77DD;
+    box-shadow: 0 0 0 3px #7F77DD1a;
+}
+
+/* ── Champ téléphone avec indicatif ── */
+.login-input-select {
+    padding: .72rem .5rem .72rem 2.6rem;
+    background: #f9fafb;
+    border: 0.5px solid #e5e7eb;
+    border-right: none;
+    border-radius: 10px 0 0 10px;
+    font-size: 13px; color: #111;
+    outline: none; cursor: pointer;
+    transition: border .18s;
+    font-family: inherit;
+    flex-shrink: 0;
+    width: 110px;
+}
+
+.login-input-select:focus {
+    border-color: #7F77DD;
+    box-shadow: 0 0 0 3px #7F77DD1a;
+}
+
+.login-input-phone {
+    flex: 1;
+    padding: .72rem 1rem;
+    background: #f9fafb;
+    border: 0.5px solid #e5e7eb;
+    border-left: none;
+    border-radius: 0 10px 10px 0;
+    font-size: 13.5px; color: #111;
+    outline: none;
+    transition: border .18s, box-shadow .18s;
+    font-family: inherit;
+}
+
+.login-input-phone:focus {
+    border-color: #7F77DD;
+    box-shadow: 0 0 0 3px #7F77DD1a;
+}
+
+/* ── Toggle mot de passe ── */
+.login-eye {
+    position: absolute; right: 10px;
+    background: none; border: none; cursor: pointer;
+    padding: 4px; opacity: .38; transition: opacity .15s;
+    display: flex; align-items: center; color: #111;
+}
+.login-eye:hover { opacity: .7; }
+
+/* ── Message d'erreur ── */
+.login-err {
+    display: block; font-size: 12px;
+    color: #dc2626; margin-top: .35rem;
+}
+
+/* ── Ligne remember + forgot ── */
+.login-row {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    margin: 1rem 0 1.5rem;
+}
+
+.login-chk {
+    display: flex; align-items: center;
+    gap: .45rem; font-size: 13px;
+    color: #6b7280; cursor: pointer;
+}
+.login-chk input { width: 15px; height: 15px; accent-color: #7F77DD; }
+
+.login-fgt {
+    font-size: 13px; color: #7F77DD;
+    text-decoration: none; font-weight: 500;
+}
+.login-fgt:hover { opacity: .7; }
+
+/* ── Bouton principal ── */
+.login-btn {
+    width: 100%; padding: .82rem;
+    border-radius: 10px; border: none;
+    background: linear-gradient(135deg, #7F77DD, #534AB7);
+    color: #fff; font-size: 14.5px; font-weight: 500;
+    cursor: pointer; transition: transform .15s, box-shadow .15s;
+    letter-spacing: .1px; font-family: inherit;
+}
+.login-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px #7F77DD40;
+}
+
+/* ── Séparateur ── */
+.login-divider {
+    display: flex; align-items: center;
+    gap: .75rem; margin: 1.25rem 0;
+}
+.login-divider::before,
+.login-divider::after {
+    content: ''; flex: 1;
+    height: 0.5px; background: #e5e7eb;
+}
+.login-divider span { font-size: 12px; color: #9ca3af; white-space: nowrap; }
+
+/* ── Bouton secondaire (créer un compte) ── */
+.login-btn-register {
+    display: block; width: 100%;
+    padding: .78rem; border-radius: 10px;
+    border: 0.5px solid #e5e7eb;
+    background: transparent;
+    color: #111; font-size: 14px; font-weight: 500;
+    font-family: inherit;
+    text-align: center; text-decoration: none;
+    cursor: pointer; transition: background .15s, transform .15s;
+}
+.login-btn-register:hover {
+    background: #f9fafb; transform: translateY(-1px);
+}
+
+/* ── Lien bas de page ── */
+.login-signup-link {
+    text-align: center; font-size: 12.5px;
+    color: #9ca3af; margin-top: 1.25rem;
+}
+.login-signup-link a {
+    color: #7F77DD; font-weight: 500; text-decoration: none;
+}
+.login-signup-link a:hover { opacity: .7; }
+
+/* ── Sélection de rôle ── */
+.role-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: .75rem; margin-bottom: 1.5rem;
+}
+
+.role-card {
+    border: 0.5px solid #e5e7eb; border-radius: 12px;
+    padding: .9rem .75rem; cursor: pointer;
+    transition: all .2s; text-align: center;
+    background: #f9fafb; user-select: none;
+}
+.role-card:hover { border-color: #7F77DD88; background: #fff; }
+.role-card.active {
+    border-color: #7F77DD; background: #7F77DD0d;
+    box-shadow: 0 0 0 3px #7F77DD1a;
+}
+
+.role-icon {
+    width: 36px; height: 36px; border-radius: 9px;
+    background: #fff; border: 0.5px solid #e5e7eb;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto .6rem; transition: all .2s;
+}
+.role-card.active .role-icon {
+    background: linear-gradient(135deg, #7F77DD, #534AB7);
+    border-color: transparent; color: white;
+}
+.role-name  { font-size: 13px; font-weight: 500; color: #111; }
+.role-desc  { font-size: 11px; color: #9ca3af; margin-top: .2rem; }
+
+/* ── Code d'accès ── */
+.code-box {
+    background: #7F77DD0a; border: 0.5px solid #7F77DD33;
+    border-radius: 12px; padding: 1rem;
+    margin-bottom: 1.1rem; display: none;
+}
+.code-box.visible {
+    display: block;
+    animation: fadeIn .3s ease;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.code-hint {
+    font-size: 11.5px; color: #7F77DD;
+    margin-bottom: .6rem; line-height: 1.5;
+}
+
+/* ── Colonnes mots de passe ── */
+.reg-cols {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: .75rem;
+}
+@media (max-width: 400px) {
+    .reg-cols { grid-template-columns: 1fr; }
+}
+
+/* ── Libellé dans code-box ── */
+.lbl {
+    display: block; font-size: 11.5px; font-weight: 500;
+    letter-spacing: .4px; text-transform: uppercase;
+    color: #534AB7; margin-bottom: .45rem;
+}
