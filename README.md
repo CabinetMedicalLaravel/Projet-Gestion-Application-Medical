@@ -2,7 +2,7 @@
 
 **MediFlow** est une application web développée avec Laravel pour digitaliser la gestion d'un cabinet médical. Elle permet la prise de rendez-vous, la gestion des dossiers patients et la coordination entre médecins et secrétaires.
 
-## 👥 Rôles et Accès
+##  Rôles et Accès
 L'application gère trois types d'utilisateurs avec des accès spécifiques :
 - **Médecin :** Accès au tableau de bord médical, statistiques et consultations.
 - **Secrétaire :** Gestion du planning, accueil des patients et rendez-vous.
@@ -10,7 +10,7 @@ L'application gère trois types d'utilisateurs avec des accès spécifiques :
 
 ---
 
-## 🚀 Installation (Pour l'équipe)
+##  Installation (Pour l'équipe)
 
 Suivez ces étapes pour installer le projet sur votre machine locale :
 
