@@ -1,10 +1,21 @@
+
+<style>
+.dark input, .dark textarea, .dark select {
+    background: #141e2e !important;
+    border-color: #233044 !important;
+    color: #e2e8f0 !important;
+}
+.dark label { color: #7a8fa6 !important; }
+.dark p.text-sm { color: #7a8fa6 !important; }
+.dark h2 { color: #e8eef8 !important; }
+</style>
 <section>
     <header>
-        <h2 class="text-lg font-medium text-gray-900">
+        <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
             {{ __('Update Password') }}
         </h2>
 
-        <p class="mt-1 text-sm text-gray-600">
+        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
             {{ __('Ensure your account is using a long, random password to stay secure.') }}
         </p>
     </header>
