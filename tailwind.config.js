@@ -5,15 +5,20 @@ import forms from '@tailwindcss/forms';
 export default {
     darkMode: 'class',
     content: [
-        './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
-        './storage/framework/views/*.php',
-        './resources/views/**/*.blade.php',
-    ],
-
+    "./resources/**/*.blade.php", // C'est cette ligne qui est CRUCIALE
+    "./resources/**/*.js",
+    "./resources/**/*.vue",
+  ],
     theme: {
         extend: {
-            fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+            colors: {
+                dental: {
+                    'dark': '#0D47A1',   // Bleu Marine (Titres)
+                    'main': '#1976D2',   // Bleu Royal (Boutons)
+                    'accent': '#1E88E5', // Bleu Vif (Hover)
+                    'light': '#2196F3',  // Bleu Ciel (Badges)
+                    'soft': '#1565C0',   // Bleu Intermédiaire
+                },
             },
             maxWidth: {
                 'card-lg': '900px', // ← ajoute (utilisé dans prendre.blade)
@@ -22,4 +27,5 @@ export default {
     },
 
     plugins: [forms],
+
 };

@@ -25,6 +25,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'telephone',
         'specialite', 
         'profile_photo',
+
     ];
 
     /**
@@ -71,9 +72,25 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->role === 'secretaire';
     }
 
+
+    public function consultationsAsPatient()
+{
+    return $this->hasMany(Consultation::class, 'patient_id');
+}
+
+    public function medecin(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Medecin::class, 'user_id');
+    }
+    public function getSpecialiteAttribute(): ?string
+    {
+        return $this->medecin?->specialite;
+    }
+
     public function secretaire()
 {
     // Un utilisateur peut être lié à un profil secrétaire
     return $this->hasOne(Secretaire::class);
 }
+
 }

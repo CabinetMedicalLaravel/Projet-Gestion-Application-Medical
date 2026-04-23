@@ -150,6 +150,7 @@
                         </div>
                     </div>
                 </div>
+               
 
                 <!-- COLONNE DROITE (RACCOURCIS & NOTIFS) -->
                 <div class="space-y-8">
@@ -164,10 +165,28 @@
                                 </div>
                                 <div class="ml-4 text-sm font-black text-[#0D47A1] group-hover:text-white transition">Agenda complet</div>
                             </a>
+<<<<<<< HEAD
+<<<<<<< HEAD
+                            <a href="{{ url('/consultation/create/' . $patient->id) }}" class="block bg-[#F8F7F4] rounded-xl p-4 hover:bg-gray-100 transition">
+                                <div class="bg-white w-8 h-8 rounded-lg shadow-sm flex items-center justify-center mb-3">
+                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+=======
+                            <a href="#"
+                                class="block bg-[#F8F7F4] dark:bg-gray-700 rounded-xl p-4 hover:bg-gray-100 dark:hover:bg-gray-600 transition">
+                                <div
+                                    class="bg-white dark:bg-gray-800 w-8 h-8 rounded-lg shadow-sm flex items-center justify-center mb-3">
+                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+>>>>>>> c786c016ab5bdb026b76331043925fce08a52a25
+=======
 
                             <a href="#" class="flex items-center p-4 bg-[#E3F2FD] rounded-2xl border border-[#90CAF9] group hover:bg-[#1565C0] transition-all duration-300 shadow-sm">
                                 <div class="bg-white p-3 rounded-xl shadow-sm group-hover:scale-110 transition-transform">
                                     <svg class="w-6 h-6 text-[#1565C0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+>>>>>>> 1a9fef19a87a0a690b3701666bf2609ac82c8e3b
                                 </div>
                                 <div class="ml-4 text-sm font-black text-[#0D47A1] group-hover:text-white transition">Ordonnances</div>
                             </a>

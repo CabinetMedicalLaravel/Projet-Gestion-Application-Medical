@@ -4,6 +4,12 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\CompleteProfileController; // Importation ajoutée
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\ConsultationController;
+
+use Carbon\Carbon;
+use App\Models\Appointment;
+
 use App\Models\User;
 
 /*
@@ -16,7 +22,23 @@ use App\Models\User;
 Route::get('/', function () {
     if (Auth::check()) return redirect('/dashboard');
     return view('welcome');
+    
 });
+
+
+ 
+
+
+Route::get('/consultation/create/{patient}', [ConsultationController::class, 'create'])->name('consultation.create');
+
+
+Route::post('/consultation/store', [ConsultationController::class, 'store'])->name('consultation.store');
+
+Route::get('/consultations', [ConsultationController::class, 'index'])->name('consultations.index');
+
+Route::get('/consultation/pdf/{id}', [ConsultationController::class, 'generatePDF'])
+     ->name('consultation.pdf');
+
 
 Route::get('/', function () {
     // On récupère uniquement les utilisateurs qui sont des médecins
@@ -28,13 +50,14 @@ Route::get('/', function () {
 });
 
 // ── 1. ROUTE DE REDIRECTION (Point d'entrée après Login) ───────────────
+
 Route::middleware(['auth', 'verified'])->get('/dashboard', function () {
     return match (Auth::user()->role) {
         'medecin'    => redirect()->route('medecin.dashboard'),
         'secretaire' => redirect()->route('secretaire.dashboard'),
         default      => redirect()->route('patient.dashboard'),
     };
-})->name('dashboard');
+})->name('dashboard');           
 
 // Helper: build 24h notifications for any user
 function getNotifications(string $role, int $userId): array {
@@ -54,7 +77,7 @@ function getNotifications(string $role, int $userId): array {
             ? 'Dr. ' . ($r->doctor->name ?? '—')
             : ($r->patient_display_name);
         return [
-            'message' => "⏰ RDV dans moins de 24h — {$who} à " . $dt->format('H:i'),
+            'message' => " RDV dans moins de 24h — {$who} à " . $dt->format('H:i'),
             'date'    => $dt->translatedFormat('d M Y'),
             'type'    => 'warning',
         ];
@@ -71,14 +94,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // --- ESPACE PATIENT ---
     Route::get('/patient/dashboard', function () {
         if (Auth::user()->role !== 'patient') abort(403);
-
+        $user = Auth::user();
         return view('dashboard', [
             'patient'       => $user,
-            'rdv'           => $rdv,
+            'rdv'           =>[],
             'notifications' => getNotifications('patient', $user->id),
             'nbOrdonnances' => 0,
         ]);
     })->name('patient.dashboard');
+
+
+
+
+
+    // ── MÉDECIN DASHBOARD ────────────────────────────────────────────────
+
 
     // Page d'accueil patient connecté (après clic sur le logo)
     Route::get('/patient/accueil', function () {
@@ -88,6 +118,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('patient.accueil');
 
     // --- ESPACE MÉDECIN ---
+
     Route::get('/medecin/dashboard', function () {
         if (Auth::user()->role !== 'medecin') abort(403);
         $medecinId = Auth::id();
@@ -117,14 +148,31 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'statut'  => $r->status,
         ])->toArray();
 
+        $medecinId = Auth::id(); // Récupère l'ID du médecin actuellement connecté
+
         return view('medecin.dashboard', [
+
+            // 1. Compte uniquement les patients qui ont eu une consultation avec CE médecin
+            'nbPatients' => \App\Models\Consultation::where('medecin_id', $medecinId)
+                    ->distinct('patient_id')
+                    ->count(),
+            // 2. Compte uniquement les consultations (ordonnances) de CE médecin
+            'nbOrdonnances'    => \App\Models\Consultation::where('medecin_id', $medecinId)->count(),
+            
+            
+            // 3. Affiche uniquement les derniers patients vus par CE médecin
+            'derniersPatients' => \App\Models\User::whereHas('consultationsAsPatient', function($query) use ($medecinId) {
+                                    $query->where('medecin_id', $medecinId);
+                                })->latest()->take(5)->get(),
+            
+
             'nbRdvAujourdhui'  => $rdvAujourdhuiRaw->count(),
             'nbPatients'       => $nbPatients,
             'nbEnAttente'      => $nbEnAttente,
-            'nbOrdonnances'    => 0,
             'rdvAujourdhui'    => $rdvAujourdhui,
             'derniersPatients' => $derniersPatients,
             'notifications'    => getNotifications('medecin', Auth::id()),
+
         ]);
     })->name('medecin.dashboard');
 
@@ -167,4 +215,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__ . '/auth.php';
+
+
+require __DIR__.'/auth.php';
+
+

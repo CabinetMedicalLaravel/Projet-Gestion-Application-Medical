@@ -11,16 +11,17 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            // Combined role and telephone here
-            $table->enum('role', ['patient', 'medecin', 'secretaire'])->default('patient');
-            $table->string('telephone', 20)->nullable();
-            $table->rememberToken();
-            $table->timestamps();
+        $table->id();
+        $table->string('name');
+        $table->string('email')->unique();
+        $table->timestamp('email_verified_at')->nullable();
+        $table->string('password');
+        $table->rememberToken();
+        $table->timestamps();
+        $table->enum('role', ['patient', 'medecin', 'secretaire'])->default('patient');
+        $table->string('telephone', 20)->nullable();
+            
+
         });
     }
 

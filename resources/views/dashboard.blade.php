@@ -65,6 +65,22 @@
                     <p class="text-3xl font-black text-[#0D47A1]">{{ count($rdv) }}</p>
                     <p class="text-gray-400 text-xs font-bold mt-1 uppercase tracking-tighter">Historique complet</p>
                 </div>
+<<<<<<< HEAD
+                <!-- Bloc 3 -->
+<<<<<<< HEAD
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <span class="text-gray-400 text-sm">Ordonnances</span>
+                <h3 class="text-3xl font-bold mt-2">
+                  {{ count($ordonnances ?? []) }}
+                </h3>
+                      <p class="text-xs text-gray-400 mt-1">téléchargeables</p>
+                 </div>
+=======
+                <div class="bg-[#F8F7F4] dark:bg-gray-800 rounded-2xl p-6">
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Ordonnances</p>
+                    <p class="text-3xl font-semibold text-gray-900 dark:text-gray-100 mb-1">{{ $nbOrdonnances }}</p>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm">téléchargeables</p>
+=======
 
                 <!-- Ordonnances -->
                 <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all border-l-4 border-[#2196F3]">
@@ -76,7 +92,9 @@
                     </div>
                     <p class="text-3xl font-black text-[#0D47A1]">{{ $nbOrdonnances }}</p>
                     <p class="text-gray-400 text-xs font-bold mt-1 uppercase tracking-tighter">disponibles</p>
+>>>>>>> 1a9fef19a87a0a690b3701666bf2609ac82c8e3b
                 </div>
+>>>>>>> c786c016ab5bdb026b76331043925fce08a52a25
             </div>
 
             <!-- SECTION 2 : CONTENU PRINCIPAL -->

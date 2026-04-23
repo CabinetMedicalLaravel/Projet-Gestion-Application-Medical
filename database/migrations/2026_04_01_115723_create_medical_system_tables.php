@@ -6,61 +6,57 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        // 1. Patient Table
-        Schema::create('patients', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('nom');
-            $table->string('prenom');
-            $table->date('date_naissance');
-            $table->string('adresse');
-            $table->string('telephone');
-            $table->timestamps();
-        });
-
-        // 2. Medecin Table
+        // 1. Table Medecins (Indispensable avant les consultations)
         Schema::create('medecins', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('specialite');
             $table->string('numero_ordre');
             $table->timestamps();
         });
 
-        // 3. Secretaire Table (Added based on your UML)
+        // 2. Table Secretaires
         Schema::create('secretaires', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
+        
+        Schema::create('patients', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
+    $table->string('nom');
+    $table->string('prenom');
+    $table->string('telephone')->nullable();
+    $table->timestamps();
+});
 
-        // 4. RendezVous Table
+        // 3. Table RendezVous (Liaison vers USERS pour le patient)
         Schema::create('rendez_vous', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('patient_id')->constrained('patients');
-            $table->foreignId('medecin_id')->constrained('medecins');
+            $table->foreignId('patient_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('medecin_id')->constrained('medecins')->onDelete('cascade');
             $table->date('date');
             $table->time('heure');
             $table->string('statut')->default('en_attente');
             $table->timestamps();
         });
 
-        // 5. Consultations
+        // 4. Table Consultations (Une seule fois !)
         Schema::create('consultations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('patient_id')->constrained('patients');
-            $table->foreignId('medecin_id')->constrained('medecins');
-            $table->text('motif');
+            $table->foreignId('patient_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('medecin_id')->constrained('users')->onDelete('cascade');
             $table->text('diagnostic');
+            $table->text('traitement');
+            $table->text('medicaments')->nullable();
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
 
-        // 6. Ordonnances (Composition from Consultation)
+        // 5. Table Ordonnances
         Schema::create('ordonnances', function (Blueprint $table) {
             $table->id();
             $table->foreignId('consultation_id')->constrained()->onDelete('cascade');
@@ -70,17 +66,12 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        // Drop tables in reverse order to avoid foreign key errors
         Schema::dropIfExists('ordonnances');
         Schema::dropIfExists('consultations');
         Schema::dropIfExists('rendez_vous');
         Schema::dropIfExists('secretaires');
         Schema::dropIfExists('medecins');
-        Schema::dropIfExists('patients');
     }
 };
