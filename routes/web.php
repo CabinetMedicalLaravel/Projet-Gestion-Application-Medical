@@ -3,6 +3,9 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\ConsultationController;
+use App\Http\Controllers\PatientController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -11,9 +14,23 @@ use Illuminate\Support\Facades\Auth;
 */
 
 Route::get('/', function () {
+    if (Auth::check())
+        return redirect('/dashboard');
     return view('welcome');
+    
 });
 
+
+// On crée une route qui prend l'ID du patient en paramètre
+Route::get('/consultation/create/{patient}', [ConsultationController::class, 'create'])->name('consultation.create');
+
+// La route pour enregistrer le formulaire
+Route::post('/consultation/store', [ConsultationController::class, 'store'])->name('consultation.store');
+
+Route::get('/consultations', [ConsultationController::class, 'index'])->name('consultations.index');
+
+Route::get('/consultation/pdf/{id}', [ConsultationController::class, 'generatePDF'])
+     ->name('consultation.pdf');
 // ── 1. ROUTE DE REDIRECTION (Point d'entrée après Login/Vérification) ──
 // Cette route sert de "chef d'orchestre" pour envoyer chaque rôle au bon endroit.
 Route::middleware(['auth', 'verified'])->get('/dashboard', function () {
@@ -25,7 +42,7 @@ Route::middleware(['auth', 'verified'])->get('/dashboard', function () {
         'patient'    => redirect()->route('patient.dashboard'),
         default      => redirect('/'),
     };
-})->name('dashboard');
+})->name('dashboard');           
 
 
 // ── 2. GROUPES DE ROUTES PROTÉGÉS PAR RÔLE ─────────────────────────────
@@ -45,16 +62,30 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('patient.dashboard');
 
     // --- ESPACE MÉDECIN ---
+    // --- ESPACE MÉDECIN ---
+// --- ESPACE MÉDECIN ---
     Route::get('/medecin/dashboard', function () {
         if (Auth::user()->role !== 'medecin') abort(403);
 
+        $medecinId = Auth::id(); // Récupère l'ID du médecin actuellement connecté
+
         return view('medecin.dashboard', [
+            // 1. Compte uniquement les patients qui ont eu une consultation avec CE médecin
+            'nbPatients' => \App\Models\Consultation::where('medecin_id', $medecinId)
+                    ->distinct('patient_id')
+                    ->count(),
+            // 2. Compte uniquement les consultations (ordonnances) de CE médecin
+            'nbOrdonnances'    => \App\Models\Consultation::where('medecin_id', $medecinId)->count(),
+            
             'nbRdvAujourdhui'  => 0,
-            'nbPatients'       => 0,
             'nbEnAttente'      => 0,
-            'nbOrdonnances'    => 0,
             'rdvAujourdhui'    => [],
-            'derniersPatients' => [],
+            
+            // 3. Affiche uniquement les derniers patients vus par CE médecin
+            'derniersPatients' => \App\Models\User::whereHas('consultationsAsPatient', function($query) use ($medecinId) {
+                                    $query->where('medecin_id', $medecinId);
+                                })->latest()->take(5)->get(),
+            
             'notifications'    => [],
         ]);
     })->name('medecin.dashboard');
@@ -82,5 +113,6 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
 
 require __DIR__.'/auth.php';

@@ -29,11 +29,13 @@
                     <p class="text-gray-500 text-sm">enregistrés dans le système</p>
                 </div>
                 <!-- Bloc 3 -->
-                <div class="bg-[#F8F7F4] rounded-2xl p-6">
-                    <p class="text-sm font-medium text-gray-600 mb-2">Ordonnances</p>
-                    <p class="text-3xl font-semibold text-gray-900 mb-1">{{ $nbOrdonnances }}</p>
-                    <p class="text-gray-500 text-sm">téléchargeables</p>
-                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <span class="text-gray-400 text-sm">Ordonnances</span>
+                <h3 class="text-3xl font-bold mt-2">
+                  {{ count($ordonnances ?? []) }}
+                </h3>
+                      <p class="text-xs text-gray-400 mt-1">téléchargeables</p>
+                 </div>
             </div>
 
             <!-- SECTION 2 : Contenu principal -->
