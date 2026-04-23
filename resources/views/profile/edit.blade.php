@@ -1,25 +1,29 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-slate-200 leading-tight">
-            {{ __('Profile') }}
+        <h2 class="font-bold text-2xl text-gray-800 leading-tight">
+            {{ __('Mon Profil Médical') }}
         </h2>
     </x-slot>
 
-    <div class="py-12 bg-gray-100 dark:bg-slate-900 min-h-screen">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white dark:bg-slate-800 shadow sm:rounded-lg border border-gray-100 dark:border-slate-700">
+    <div class="py-12 bg-[#F9FAFB] min-h-screen">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
+            
+            <!-- Section Informations Personnelles -->
+            <div class="p-8 sm:p-12 bg-white shadow-xl shadow-gray-100 rounded-[2rem] border border-gray-100">
                 <div class="max-w-xl">
                     @include('profile.partials.update-profile-information-form')
                 </div>
             </div>
 
-            <div class="p-4 sm:p-8 bg-white dark:bg-slate-800 shadow sm:rounded-lg border border-gray-100 dark:border-slate-700">
+            <!-- Section Mot de Passe -->
+            <div class="p-8 sm:p-12 bg-white shadow-xl shadow-gray-100 rounded-[2rem] border border-gray-100">
                 <div class="max-w-xl">
                     @include('profile.partials.update-password-form')
                 </div>
             </div>
 
-            <div class="p-4 sm:p-8 bg-white dark:bg-slate-800 shadow sm:rounded-lg border border-gray-100 dark:border-slate-700">
+            <!-- Section Suppression (Optionnel) -->
+            <div class="p-8 sm:p-12 bg-white shadow-xl shadow-gray-100 rounded-[2rem] border border-red-50">
                 <div class="max-w-xl">
                     @include('profile.partials.delete-user-form')
                 </div>

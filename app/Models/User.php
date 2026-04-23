@@ -2,8 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Medecin;
-use Illuminate\Contracts\Auth\MustVerifyEmail; // Importation décommentée
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -22,8 +21,10 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
-        'role',      // Ajouté pour ta migration
-        'telephone', // Ajouté pour ta migration
+        'role',
+        'telephone',
+        'specialite', 
+        'profile_photo',
     ];
 
     /**
@@ -69,12 +70,10 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->role === 'secretaire';
     }
-    public function medecin(): \Illuminate\Database\Eloquent\Relations\HasOne
-    {
-        return $this->hasOne(Medecin::class, 'user_id');
-    }
-    public function getSpecialiteAttribute(): ?string
-    {
-        return $this->medecin?->specialite;
-    }
+
+    public function secretaire()
+{
+    // Un utilisateur peut être lié à un profil secrétaire
+    return $this->hasOne(Secretaire::class);
+}
 }
