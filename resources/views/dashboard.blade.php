@@ -1,110 +1,170 @@
 <x-app-layout>
-    <div class="py-8 bg-white min-h-screen font-sans text-gray-900">
+    <!-- On définit les couleurs personnalisées en haut pour plus de clarté -->
+    <div class="py-8 bg-[#F0F4F8] min-h-screen font-sans text-gray-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
-            <!-- EN-TÊTE DYNAMIQUE -->
-            <div class="mb-8 mt-4">
-                <h1 class="text-3xl font-semibold text-gray-900">Bonjour, {{ Auth::user()->name }}</h1>
-                <p class="text-gray-500 mt-1">
-                    {{ \Carbon\Carbon::now()->translatedFormat('l d F Y') }} — voici un résumé de votre espace patient
-                </p>
+            <!-- MESSAGE DE SUCCÈS -->
+            @if(session('success'))
+                <div class="mb-6 p-4 bg-[#E3F2FD] border border-[#2196F3] text-[#0D47A1] rounded-2xl font-bold flex items-center shadow-sm">
+                    <svg class="w-5 h-5 mr-3 text-[#1976D2]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            <!-- EN-TÊTE AVEC BANNIÈRE DYNAMIQUE (DÉGRADÉ BLEU PRO) -->
+            <div class="relative bg-gradient-to-r from-[#0D47A1] via-[#1565C0] to-[#1976D2] rounded-3xl p-8 mb-8 text-white shadow-xl overflow-hidden">
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between">
+                    <div>
+                        <h1 class="text-3xl font-bold tracking-tight">Bonjour, {{ Auth::user()->name }} ! 👋</h1>
+                        <p class="text-blue-50 mt-2 opacity-90 font-medium">
+                            {{ \Carbon\Carbon::now()->translatedFormat('l d F Y') }} — Votre santé, notre priorité.
+                        </p>
+                    </div>
+                    <div class="mt-4 md:mt-0">
+                        @if(Auth::user()->profile_photo)
+                            <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" class="h-20 w-20 rounded-full border-4 border-white/20 shadow-2xl object-cover">
+                        @else
+                            <div class="h-20 w-20 rounded-full bg-white/10 flex items-center justify-center border-4 border-white/20 text-2xl font-bold text-white">
+                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                <!-- Décoration fond -->
+                <div class="absolute top-0 right-0 -mr-16 -mt-16 opacity-10 text-white">
+                    <svg width="250" height="250" fill="currentColor" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"/></svg>
+                </div>
             </div>
 
-            <!-- SECTION 1 : STATISTIQUES DYNAMIQUES -->
+            <!-- SECTION 1 : STATISTIQUES (BORDURES DÉGRADÉES DE BLEU) -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <!-- Bloc 1 -->
-                <div class="bg-[#F8F7F4] rounded-2xl p-6">
-                    <p class="text-sm font-medium text-gray-600 mb-2">Prochain RDV</p>
+                <!-- Prochain RDV -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all border-l-4 border-[#1E88E5]">
+                    <div class="flex items-center justify-between mb-4">
+                        <p class="text-sm font-bold text-gray-400 uppercase tracking-wider">Prochain RDV</p>
+                        <div class="p-2 bg-[#E3F2FD] rounded-xl text-[#1976D2]">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        </div>
+                    </div>
                     @if(count($rdv) > 0)
-                        <p class="text-3xl font-semibold text-gray-900 mb-1">{{ $rdv[0]['jour'] }} {{ $rdv[0]['mois'] }}</p>
-                        <a href="#" class="text-blue-600 font-medium text-sm hover:underline">{{ $rdv[0]['medecin'] }} — {{ $rdv[0]['heure'] }}</a>
+                        <p class="text-3xl font-black text-[#0D47A1]">{{ $rdv[0]['jour'] }} {{ $rdv[0]['mois'] }}</p>
+                        <p class="text-[#1E88E5] font-bold mt-1 uppercase text-xs">Dr. {{ $rdv[0]['medecin'] }}</p>
                     @else
-                        <p class="text-xl font-semibold text-gray-400 mb-1 mt-3">Aucun RDV prévu</p>
+                        <p class="text-xl font-bold text-gray-400 mt-2 italic">Aucun RDV prévu</p>
                     @endif
                 </div>
-                <!-- Bloc 2 -->
-                <div class="bg-[#F8F7F4] rounded-2xl p-6">
-                    <p class="text-sm font-medium text-gray-600 mb-2">Total de vos RDV</p>
-                    <p class="text-3xl font-semibold text-gray-900 mb-1">{{ count($rdv) }}</p>
-                    <p class="text-gray-500 text-sm">enregistrés dans le système</p>
+
+                <!-- Total RDV -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all border-l-4 border-[#1565C0]">
+                    <div class="flex items-center justify-between mb-4">
+                        <p class="text-sm font-bold text-gray-400 uppercase tracking-wider">Total RDV</p>
+                        <div class="p-2 bg-[#E3F2FD] rounded-xl text-[#1565C0]">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                        </div>
+                    </div>
+                    <p class="text-3xl font-black text-[#0D47A1]">{{ count($rdv) }}</p>
+                    <p class="text-gray-400 text-xs font-bold mt-1 uppercase tracking-tighter">Historique complet</p>
                 </div>
-                <!-- Bloc 3 -->
-                <div class="bg-[#F8F7F4] rounded-2xl p-6">
-                    <p class="text-sm font-medium text-gray-600 mb-2">Ordonnances</p>
-                    <p class="text-3xl font-semibold text-gray-900 mb-1">{{ $nbOrdonnances }}</p>
-                    <p class="text-gray-500 text-sm">téléchargeables</p>
+
+                <!-- Ordonnances -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all border-l-4 border-[#2196F3]">
+                    <div class="flex items-center justify-between mb-4">
+                        <p class="text-sm font-bold text-gray-400 uppercase tracking-wider">Ordonnances</p>
+                        <div class="p-2 bg-[#E3F2FD] rounded-xl text-[#2196F3]">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        </div>
+                    </div>
+                    <p class="text-3xl font-black text-[#0D47A1]">{{ $nbOrdonnances }}</p>
+                    <p class="text-gray-400 text-xs font-bold mt-1 uppercase tracking-tighter">disponibles</p>
                 </div>
             </div>
 
-            <!-- SECTION 2 : Contenu principal -->
+            <!-- SECTION 2 : CONTENU PRINCIPAL -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
                 <!-- COLONNE GAUCHE -->
                 <div class="lg:col-span-2 space-y-8">
-                    
-                    <!-- Carte : Mes prochains rendez-vous (BOUCLE DYNAMIQUE) -->
-                    <div class="border border-gray-200 rounded-2xl p-6">
-                        <h2 class="text-lg font-semibold mb-6">Mes prochains rendez-vous</h2>
-                        
-                        <div class="space-y-6">
-                            @forelse ($rdv as $rendezVous)
-                                <div class="flex items-center justify-between pb-6 border-b border-gray-100 last:border-0 last:pb-0">
-                                    <div class="flex items-center gap-4">
-                                        <div class="bg-[#EEF4FF] text-blue-700 rounded-xl p-3 flex flex-col items-center justify-center w-14 h-14">
-                                            <span class="text-lg font-bold leading-none">{{ $rendezVous['jour'] }}</span>
-                                            <span class="text-xs font-semibold uppercase mt-1 leading-none">{{ $rendezVous['mois'] }}</span>
+                    <!-- Carte : Mes prochains rendez-vous -->
+                    <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="px-8 py-6 border-b border-gray-50 bg-[#F8FAFC] flex justify-between items-center">
+                            <h2 class="text-lg font-black text-[#0D47A1]">Mes prochains rendez-vous</h2>
+                            <button class="text-[#1976D2] text-sm font-black hover:text-[#0D47A1] uppercase tracking-tight transition">Voir tout</button>
+                        </div>
+                        <div class="p-8">
+                            <div class="space-y-4">
+                                @forelse ($rdv as $rendezVous)
+                                    <div class="flex items-center justify-between p-5 rounded-2xl border border-transparent hover:border-[#BBDEFB] hover:bg-[#F1F8FE] transition-all duration-200">
+                                        <div class="flex items-center gap-5">
+                                            <div class="bg-[#1976D2] text-white rounded-2xl p-2 flex flex-col items-center justify-center w-16 h-16 shadow-lg shadow-blue-100">
+                                                <span class="text-xl font-black leading-none">{{ $rendezVous['jour'] }}</span>
+                                                <span class="text-[10px] font-black uppercase tracking-tighter">{{ $rendezVous['mois'] }}</span>
+                                            </div>
+                                            <div>
+                                                <p class="font-black text-[#0D47A1] text-lg leading-tight">Dr. {{ $rendezVous['medecin'] }}</p>
+                                                <p class="text-[#1E88E5] text-sm font-bold italic">{{ $rendezVous['specialite'] ?? 'Consultation' }}</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p class="font-semibold text-gray-900 text-base">{{ $rendezVous['medecin'] }}</p>
-                                            <p class="text-gray-500 text-sm">{{ $rendezVous['specialite'] }}</p>
+                                        <div class="text-right">
+                                            <p class="font-black text-gray-900 text-base">{{ $rendezVous['heure'] }}</p>
+                                            <span class="inline-flex items-center px-4 py-1 mt-1 rounded-full text-[10px] font-black uppercase tracking-tighter bg-emerald-100 text-emerald-700">
+                                                {{ $rendezVous['statut'] }}
+                                            </span>
                                         </div>
                                     </div>
-                                    <div class="text-right">
-                                        <p class="font-medium text-gray-900 mb-1">{{ $rendezVous['heure'] }}</p>
-                                        <span class="bg-[#E6F6ED] text-[#0A7B45] text-xs font-semibold px-2.5 py-1 rounded-full">{{ $rendezVous['statut'] }}</span>
+                                @empty
+                                    <div class="text-center py-12">
+                                        <p class="text-gray-400 font-bold italic">Aucun rendez-vous à venir.</p>
                                     </div>
-                                </div>
-                            @empty
-                                <!-- MESSAGE AFFICHE SI LE PATIENT N'A PAS DE RDV -->
-                                <div class="text-center py-10 bg-gray-50 rounded-xl border border-dashed border-gray-300">
-                                    <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                    <p class="text-gray-500 font-medium">Vous n'avez aucun rendez-vous à venir.</p>
-                                    <a href="#" class="mt-3 inline-block text-blue-600 text-sm hover:underline">Prendre un rendez-vous maintenant</a>
-                                </div>
-                            @endforelse
+                                @endforelse
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Carte : Notifications récentes -->
-                    <div class="border border-gray-200 rounded-2xl p-6">
-                        <h2 class="text-lg font-semibold mb-6">Notifications récentes</h2>
-                        <ul class="space-y-5">
+                    <!-- Carte : Notifications -->
+                    <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8">
+                        <h2 class="text-lg font-black text-[#0D47A1] mb-8 flex items-center">
+                            <span class="w-2 h-6 bg-[#1976D2] rounded-full mr-3"></span>
+                            Centre de Notifications
+                        </h2>
+                        <div class="space-y-6">
                             @forelse ($notifications as $notif)
-                                <li class="relative pl-6 pb-5 border-b border-gray-100">
-                                    <span class="absolute left-0 top-1.5 w-2.5 h-2.5 bg-blue-500 rounded-full"></span>
-                                    <p class="text-sm font-medium text-gray-900">{{ $notif['message'] }}</p>
-                                    <p class="text-xs text-gray-500 mt-1">{{ $notif['date'] }}</p>
-                                </li>
+                                <div class="flex gap-5 p-4 rounded-2xl bg-[#F8FAFC] border border-transparent hover:border-[#BBDEFB] transition duration-300">
+                                    <div class="mt-1"><div class="w-2.5 h-2.5 bg-[#1E88E5] rounded-full ring-4 ring-blue-50 shadow-sm"></div></div>
+                                    <div>
+                                        <p class="text-sm font-bold text-gray-800 leading-tight">{{ $notif['message'] }}</p>
+                                        <p class="text-[10px] text-gray-400 mt-1 uppercase font-black tracking-widest">{{ $notif['date'] }}</p>
+                                    </div>
+                                </div>
                             @empty
-                                <p class="text-gray-500 text-sm text-center py-4">Aucune notification pour le moment.</p>
+                                <p class="text-gray-400 text-center py-6 italic text-sm">Aucune notification.</p>
                             @endforelse
-                        </ul>
+                        </div>
                     </div>
                 </div>
 
-                <!-- COLONNE DROITE : Raccourcis (Ceux-ci restent statiques car ce sont des menus) -->
+                <!-- COLONNE DROITE : ACTIONS (RACCOURCIS BLEUS) -->
                 <div class="space-y-8">
-                    <div class="border border-gray-200 rounded-2xl p-6">
-                        <h2 class="text-lg font-semibold mb-6">Raccourcis</h2>
-                        <div class="grid grid-cols-2 gap-4">
-                            <a href="#" class="block bg-[#F8F7F4] rounded-xl p-4 hover:bg-gray-100 transition">
-                                <div class="bg-white w-8 h-8 rounded-lg shadow-sm flex items-center justify-center mb-3">
-                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <!-- Actions rapides -->
+                    <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8">
+                        <h2 class="text-lg font-black text-[#0D47A1] mb-6 tracking-tighter">Raccourcis</h2>
+                        <div class="grid grid-cols-1 gap-4">
+                            <a href="#" class="flex items-center p-4 bg-[#F1F8FE] rounded-2xl border border-[#BBDEFB] group hover:bg-[#1976D2] transition-all duration-300 shadow-sm">
+                                <div class="bg-white p-3 rounded-xl shadow-sm group-hover:scale-110 transition-transform">
+                                    <svg class="w-6 h-6 text-[#1976D2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                                 </div>
-                                <h3 class="font-semibold text-gray-900 text-sm">Prendre RDV</h3>
-                                <p class="text-xs text-gray-500 mt-1">Réserver un créneau</p>
+                                <div class="ml-4">
+                                    <h3 class="font-black text-[#0D47A1] group-hover:text-white transition text-sm">Prendre RDV</h3>
+                                </div>
                             </a>
-                            <!-- ... J'ai gardé le premier bouton, vous pouvez remettre les 3 autres ici ... -->
+
+                            <a href="#" class="flex items-center p-4 bg-[#E3F2FD] rounded-2xl border border-[#90CAF9] group hover:bg-[#1565C0] transition-all duration-300 shadow-sm">
+                                <div class="bg-white p-3 rounded-xl shadow-sm group-hover:scale-110 transition-transform">
+                                    <svg class="w-6 h-6 text-[#1565C0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="font-black text-[#0D47A1] group-hover:text-white transition text-sm">Dossier Médical</h3>
+                                </div>
+                            </a>
                         </div>
                     </div>
                 </div>

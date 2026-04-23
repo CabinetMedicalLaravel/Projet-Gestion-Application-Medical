@@ -1,185 +1,144 @@
 <x-guest-layout>
-
-    {{-- Logo --}}
-    <div class="login-logo">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-        </svg>
-    </div>
-
-    <h1 class="login-heading">Créer un compte</h1>
-    <p class="login-sub">Choisissez votre profil pour commencer</p>
-
-    {{-- Sélection du rôle --}}
-    <div class="role-grid">
-        <div class="role-card active" id="role-patient" onclick="selectRole('patient')">
-            <div class="role-icon">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                    <circle cx="12" cy="7" r="4"/>
+    <div class="font-sans">
+        {{-- Logo Icône --}}
+        <div class="flex justify-center mb-6">
+            <div class="w-12 h-12 bg-[#1976D2] rounded-2xl shadow-lg flex items-center justify-center">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
                 </svg>
             </div>
-            <div class="role-name">Patient</div>
-            <div class="role-desc">Accès à vos rendez-vous</div>
         </div>
-        <div class="role-card" id="role-staff" onclick="selectRole('staff')">
-            <div class="role-icon">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                    <polyline points="9 22 9 12 15 12 15 22"/>
-                </svg>
+
+        <h1 class="text-3xl font-black text-[#0D47A1] text-center mb-2">Créer un compte</h1>
+        <p class="text-[#64748B] text-center font-medium mb-8">Choisissez votre profil pour commencer</p>
+
+        {{-- Formulaire --}}
+        <form method="POST" action="{{ route('register') }}" class="space-y-6">
+            @csrf
+            <input type="hidden" name="role" id="role-input" value="patient" />
+
+            {{-- Sélection du rôle --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                <!-- Carte Patient -->
+                <div id="role-patient" onclick="selectRole('patient')" 
+                    class="cursor-pointer p-5 rounded-[1.5rem] border-2 border-[#E3F2FD] bg-[#F8FAFC] transition-all duration-300 hover:border-[#2196F3] active-role shadow-sm">
+                    <div class="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center mb-3 text-[#1976D2]" id="icon-patient">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </div>
+                    <p class="font-black text-[#0D47A1] text-sm">Patient</p>
+                    <p class="text-[11px] text-[#64748B] font-medium leading-tight">Accès à vos rendez-vous</p>
+                </div>
+
+                <!-- Carte Staff -->
+                <div id="role-staff" onclick="selectRole('staff')" 
+                    class="cursor-pointer p-5 rounded-[1.5rem] border-2 border-[#E3F2FD] bg-[#F8FAFC] transition-all duration-300 hover:border-[#2196F3] shadow-sm">
+                    <div class="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center mb-3 text-[#64748B]" id="icon-staff">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    </div>
+                    <p class="font-black text-[#0D47A1] text-sm">Médecin / Secrétaire</p>
+                    <p class="text-[11px] text-[#64748B] font-medium leading-tight">Accès personnel médical</p>
+                </div>
             </div>
-            <div class="role-name">Médecin / Secrétaire</div>
-            <div class="role-desc">Accès personnel médical</div>
-        </div>
-    </div>
 
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
-        <input type="hidden" name="role" id="role-input" value="patient" />
-
-        {{-- Code d'accès (visible seulement pour le personnel) --}}
-        <div class="code-box" id="code-box">
-            <label class="lbl">Code d'accès</label>
-            <p class="code-hint">Réservé au personnel de la clinique. Contactez l'administrateur si vous ne l'avez pas.</p>
-            <div class="login-inp-wrap">
-                <svg class="login-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="11" width="18" height="11" rx="2"/>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                </svg>
+            {{-- Code d'accès (Masqué par défaut) --}}
+            <div id="code-box" class="hidden animate-fade-in bg-[#FFFBEB] border border-[#FEF3C7] p-5 rounded-2xl">
+                <label class="text-xs font-black text-[#92400E] uppercase tracking-widest mb-1 block">Code d'accès secret</label>
+                <p class="text-[11px] text-[#B45309] font-medium mb-3">Réservé au personnel. Contactez l'administrateur.</p>
                 <input type="password" id="access_code" name="access_code"
-                    class="login-input" placeholder="Ex: MEDECIN2026" autocomplete="off"/>
-            </div>
-            @error('access_code')
-                <span class="login-err">{{ $message }}</span>
-            @enderror
-        </div>
-
-        {{-- Nom --}}
-        <div class="login-field">
-            <label for="name" class="login-label">Nom complet</label>
-            <div class="login-inp-wrap">
-                <svg class="login-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                    <circle cx="12" cy="7" r="4"/>
-                </svg>
-                <input id="name" name="name" type="text" class="login-input"
-                    placeholder="Hajar Benali"
-                    value="{{ old('name') }}" required autofocus />
-            </div>
-            @error('name')
-                <span class="login-err">{{ $message }}</span>
-            @enderror
-        </div>
-
-        {{-- Email --}}
-        <div class="login-field">
-            <label for="email" class="login-label">Adresse e-mail</label>
-            <div class="login-inp-wrap">
-                <svg class="login-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="2" y="4" width="20" height="16" rx="2"/>
-                    <path d="m2 7 10 7 10-7"/>
-                </svg>
-                <input id="email" name="email" type="email" class="login-input"
-                    placeholder="vous@exemple.com"
-                    value="{{ old('email') }}" required />
-            </div>
-            @error('email')
-                <span class="login-err">{{ $message }}</span>
-            @enderror
-        </div>
-
-        {{-- Téléphone (visible uniquement pour les patients) --}}
-        <div class="login-field" id="phone-field">
-            <label for="telephone" class="login-label">Numéro de téléphone</label>
-            <div class="login-inp-wrap">
-                <svg class="login-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.8a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
-                </svg>
-                {{-- Indicatif pays --}}
-                <select name="indicatif" id="indicatif" class="login-input-select">
-                    <option value="+212" {{ old('indicatif', '+212') === '+212' ? 'selected' : '' }}>🇲🇦 +212</option>
-                    <option value="+33"  {{ old('indicatif') === '+33'  ? 'selected' : '' }}>🇫🇷 +33</option>
-                    <option value="+32"  {{ old('indicatif') === '+32'  ? 'selected' : '' }}>🇧🇪 +32</option>
-                    <option value="+41"  {{ old('indicatif') === '+41'  ? 'selected' : '' }}>🇨🇭 +41</option>
-                    <option value="+1"   {{ old('indicatif') === '+1'   ? 'selected' : '' }}>🇺🇸 +1</option>
-                </select>
-                <input id="telephone" name="telephone" type="tel" class="login-input-phone"
-                    placeholder="06 12 34 56 78"
-                    value="{{ old('telephone') }}" />
-            </div>
-            @error('telephone')
-                <span class="login-err">{{ $message }}</span>
-            @enderror
-        </div>
-
-        {{-- Mots de passe côte à côte --}}
-        <div class="reg-cols">
-            <div class="login-field" style="margin-bottom:0">
-                <label for="password" class="login-label">Mot de passe</label>
-                <div class="login-inp-wrap">
-                    <svg class="login-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="11" width="18" height="11" rx="2"/>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                    </svg>
-                    <input id="password" name="password" type="password"
-                        class="login-input" placeholder="••••••••" required />
-                    <button type="button" class="login-eye" onclick="togglePw('password')">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                            <circle cx="12" cy="12" r="3"/>
-                        </svg>
-                    </button>
-                </div>
-                @error('password')
-                    <span class="login-err">{{ $message }}</span>
-                @enderror
+                    class="block w-full px-4 py-3 bg-white border-none rounded-xl text-sm focus:ring-2 focus:ring-[#D97706]" placeholder="Ex: MEDECIN2026" />
             </div>
 
-            <div class="login-field" style="margin-bottom:0">
-                <label for="password_confirmation" class="login-label">Confirmer</label>
-                <div class="login-inp-wrap">
-                    <svg class="login-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="11" width="18" height="11" rx="2"/>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                    </svg>
-                    <input id="password_confirmation" name="password_confirmation"
-                        type="password" class="login-input" placeholder="••••••••" required />
-                    <button type="button" class="login-eye" onclick="togglePw('password_confirmation')">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                            <circle cx="12" cy="12" r="3"/>
-                        </svg>
-                    </button>
+            {{-- Nom complet --}}
+            <div class="space-y-2">
+                <label for="name" class="text-xs font-black text-[#0D47A1] uppercase tracking-widest ml-1">Nom complet</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#1E88E5]">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </div>
+                    <input id="name" name="name" type="text" value="{{ old('name') }}" required
+                        class="block w-full pl-11 pr-4 py-4 bg-[#F8FAFC] border-none rounded-2xl text-sm focus:ring-2 focus:ring-[#2196F3] transition-all" placeholder="Hajar Benali" />
                 </div>
             </div>
-        </div>
 
-        <button type="submit" class="login-btn" style="margin-top:1.25rem">S'inscrire</button>
+            {{-- Email --}}
+            <div class="space-y-2">
+                <label for="email" class="text-xs font-black text-[#0D47A1] uppercase tracking-widest ml-1">Adresse e-mail</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#1E88E5]">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
+                    </div>
+                    <input id="email" name="email" type="email" value="{{ old('email') }}" required
+                        class="block w-full pl-11 pr-4 py-4 bg-[#F8FAFC] border-none rounded-2xl text-sm focus:ring-2 focus:ring-[#2196F3] transition-all" placeholder="vous@exemple.com" />
+                </div>
+            </div>
 
-        <p class="login-signup-link" style="margin-top:1rem">
-            Déjà inscrit ? <a href="{{ route('login') }}">Se connecter</a>
-        </p>
-    </form>
+            {{-- Téléphone --}}
+            <div id="phone-field" class="space-y-2">
+                <label for="telephone" class="text-xs font-black text-[#0D47A1] uppercase tracking-widest ml-1">Numéro de téléphone</label>
+                <div class="flex gap-2">
+                    <select name="indicatif" class="bg-[#F8FAFC] border-none rounded-2xl text-sm focus:ring-2 focus:ring-[#2196F3] py-4">
+                        <option value="+212">🇲🇦 +212</option>
+                        <option value="+33">🇫🇷 +33</option>
+                    </select>
+                    <input id="telephone" name="telephone" type="tel" value="{{ old('telephone') }}"
+                        class="block w-full px-4 py-4 bg-[#F8FAFC] border-none rounded-2xl text-sm focus:ring-2 focus:ring-[#2196F3] transition-all" placeholder="06 12 34 56 78" />
+                </div>
+            </div>
+
+            {{-- Mots de passe --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label class="text-xs font-black text-[#0D47A1] uppercase tracking-widest ml-1">Mot de passe</label>
+                    <input id="password" name="password" type="password" required
+                        class="block w-full px-4 py-4 bg-[#F8FAFC] border-none rounded-2xl text-sm focus:ring-2 focus:ring-[#2196F3] transition-all" placeholder="••••••••" />
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-black text-[#0D47A1] uppercase tracking-widest ml-1">Confirmation</label>
+                    <input id="password_confirmation" name="password_confirmation" type="password" required
+                        class="block w-full px-4 py-4 bg-[#F8FAFC] border-none rounded-2xl text-sm focus:ring-2 focus:ring-[#2196F3] transition-all" placeholder="••••••••" />
+                </div>
+            </div>
+
+            <button type="submit" class="w-full py-4 bg-gradient-to-r from-[#0D47A1] to-[#1976D2] text-white font-black uppercase tracking-widest rounded-2xl shadow-lg shadow-blue-200 hover:shadow-xl transform transition active:scale-95">
+                S'inscrire
+            </button>
+
+            <p class="text-center text-[#94A3B8] text-sm font-medium mt-6">
+                Déjà inscrit ? <a href="{{ route('login') }}" class="text-[#1976D2] font-black hover:underline ml-1">Se connecter</a>
+            </p>
+        </form>
+    </div>
+
+    <style>
+        .active-role { 
+            border-color: #0D47A1 !important; 
+            background-color: #F0F7FF !important; 
+            box-shadow: 0 10px 20px -5px rgba(13, 71, 161, 0.1) !important;
+        }
+    </style>
 
     <script>
     function selectRole(r) {
-        document.getElementById('role-patient').classList.toggle('active', r === 'patient');
-        document.getElementById('role-staff').classList.toggle('active', r === 'staff');
-        document.getElementById('code-box').classList.toggle('visible', r === 'staff');
-        document.getElementById('phone-field').style.display = r === 'patient' ? 'block' : 'none';
+        const isPatient = r === 'patient';
+        
+        // Classes des cartes
+        document.getElementById('role-patient').classList.toggle('active-role', isPatient);
+        document.getElementById('role-staff').classList.toggle('active-role', !isPatient);
+        
+        // Icônes
+        document.getElementById('icon-patient').classList.toggle('text-[#1976D2]', isPatient);
+        document.getElementById('icon-patient').classList.toggle('text-[#64748B]', !isPatient);
+        document.getElementById('icon-staff').classList.toggle('text-[#1976D2]', !isPatient);
+        document.getElementById('icon-staff').classList.toggle('text-[#64748B]', isPatient);
+
+        // Visibilité des champs
+        document.getElementById('code-box').classList.toggle('hidden', isPatient);
+        document.getElementById('phone-field').classList.toggle('hidden', !isPatient);
+        
+        // Valeurs des inputs
         document.getElementById('role-input').value = r;
-        document.getElementById('access_code').required = r === 'staff';
-        document.getElementById('telephone').required = r === 'patient';
+        document.getElementById('telephone').required = isPatient;
+        document.getElementById('access_code').required = !isPatient;
     }
-
-    function togglePw(id) {
-        const i = document.getElementById(id);
-        i.type = i.type === 'password' ? 'text' : 'password';
-    }
-
-    // Init au chargement
-    document.getElementById('telephone').required = true;
     </script>
-
 </x-guest-layout>

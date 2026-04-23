@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Auth\CompleteProfileController; // Importation ajoutée
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -10,12 +12,21 @@ use Illuminate\Support\Facades\Auth;
 |--------------------------------------------------------------------------
 */
 
+// ── 0. PAGE D'ACCUEIL PUBLIQUE ──────────────────────────────────────────
 Route::get('/', function () {
     return view('welcome');
 });
 
-// ── 1. ROUTE DE REDIRECTION (Point d'entrée après Login/Vérification) ──
-// Cette route sert de "chef d'orchestre" pour envoyer chaque rôle au bon endroit.
+Route::get('/', function () {
+    // On récupère uniquement les utilisateurs qui sont des médecins
+    $medecins = User::where('role', 'medecin')->get();
+
+    return view('welcome', [
+        'medecins' => $medecins
+    ]);
+});
+
+// ── 1. ROUTE DE REDIRECTION (Point d'entrée après Login) ───────────────
 Route::middleware(['auth', 'verified'])->get('/dashboard', function () {
     $user = Auth::user();
 
@@ -31,10 +42,14 @@ Route::middleware(['auth', 'verified'])->get('/dashboard', function () {
 // ── 2. GROUPES DE ROUTES PROTÉGÉS PAR RÔLE ─────────────────────────────
 Route::middleware(['auth', 'verified'])->group(function () {
 
+    // --- SPÉCIALITÉ MÉDECIN (Ajouté) ---
+    // Cette page s'affiche juste après l'inscription du médecin
+    Route::get('/complete-profile', [CompleteProfileController::class, 'show'])->name('complete-profile.show');
+    Route::post('/complete-profile', [CompleteProfileController::class, 'store'])->name('complete-profile.store');
+
     // --- ESPACE PATIENT ---
     Route::get('/patient/dashboard', function () {
-        // Optionnel : Sécurité supplémentaire si pas de middleware global
-        if (Auth::user()->role !== 'patient') abort(403); 
+        if (Auth::user()->role !== 'patient') abort(403);
 
         return view('dashboard', [
             'patient'       => Auth::user(),
@@ -43,6 +58,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'nbOrdonnances' => 0,
         ]);
     })->name('patient.dashboard');
+
+    // Page d'accueil patient connecté (après clic sur le logo)
+    Route::get('/patient/accueil', function () {
+        if (Auth::user()->role !== 'patient') abort(403);
+
+        return view('patient.accueil');
+    })->name('patient.accueil');
 
     // --- ESPACE MÉDECIN ---
     Route::get('/medecin/dashboard', function () {
@@ -60,19 +82,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('medecin.dashboard');
 
     // --- ESPACE SECRÉTAIRE ---
-    Route::get('/secretaire/dashboard', function () {
-        if (Auth::user()->role !== 'secretaire') abort(403);
+Route::get('/secretaire/dashboard', function () {
+    if (Auth::user()->role !== 'secretaire') abort(403);
 
-        return view('secretaire.dashboard', [
-            'nbRdvAujourdhui'    => 0,
-            'nbEnAttente'        => 0,
-            'nbNouveauxPatients' => 0,
-            'nbMedecins'         => 0,
-            'rdvEnAttente'       => [],
-            'rdvAujourdhui'      => [],
-            'notifications'      => [],
-        ]);
-    })->name('secretaire.dashboard');
+
+
+    return view('secretaire.dashboard', [
+        'nbRdvAujourdhui'    => 0, // Garde tes variables actuelles
+        'nbEnAttente'        => 0,
+        'nbNouveauxPatients' => 0,
+        'nbMedecins'         => 0,
+        'rdvEnAttente'       => [],
+        'rdvAujourdhui'      => [],
+        'notifications'      => [],
+    ]);
+})->name('secretaire.dashboard');
 
 });
 

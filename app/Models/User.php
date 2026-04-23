@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail; // Importation décommentée
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable implements MustVerifyEmail // Implémentation ajoutée
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -21,8 +21,10 @@ class User extends Authenticatable implements MustVerifyEmail // Implémentation
         'name',
         'email',
         'password',
-        'role',      // Ajouté pour ta migration
-        'telephone', // Ajouté pour ta migration
+        'role',
+        'telephone',
+        'specialite', 
+        'profile_photo',
     ];
 
     /**
@@ -68,4 +70,10 @@ class User extends Authenticatable implements MustVerifyEmail // Implémentation
     {
         return $this->role === 'secretaire';
     }
+
+    public function secretaire()
+{
+    // Un utilisateur peut être lié à un profil secrétaire
+    return $this->hasOne(Secretaire::class);
+}
 }
