@@ -1,10 +1,21 @@
+
+<style>
+.dark input, .dark textarea, .dark select {
+    background: #141e2e !important;
+    border-color: #233044 !important;
+    color: #e2e8f0 !important;
+}
+.dark label { color: #7a8fa6 !important; }
+.dark p.text-sm { color: #7a8fa6 !important; }
+.dark h2 { color: #e8eef8 !important; }
+</style>
 <section>
     <header>
-        <h2 class="text-lg font-medium text-gray-900">
+        <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
             {{ __('Profile Information') }}
         </h2>
 
-        <p class="mt-1 text-sm text-gray-600">
+        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
             {{ __("Update your account's profile information and email address.") }}
         </p>
     </header>
@@ -33,7 +44,7 @@
                     <p class="text-sm mt-2 text-gray-800">
                         {{ __('Your email address is unverified.') }}
 
-                        <button form="send-verification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <button form="send-verification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600">
                             {{ __('Click here to re-send the verification email.') }}
                         </button>
                     </p>

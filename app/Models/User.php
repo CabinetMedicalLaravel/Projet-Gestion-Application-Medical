@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Medecin;
 use Illuminate\Contracts\Auth\MustVerifyEmail; // Importation décommentée
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable implements MustVerifyEmail // Implémentation ajoutée
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -67,5 +68,13 @@ class User extends Authenticatable implements MustVerifyEmail // Implémentation
     public function isSecretaire(): bool
     {
         return $this->role === 'secretaire';
+    }
+    public function medecin(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Medecin::class, 'user_id');
+    }
+    public function getSpecialiteAttribute(): ?string
+    {
+        return $this->medecin?->specialite;
     }
 }
