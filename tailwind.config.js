@@ -3,6 +3,7 @@ import forms from '@tailwindcss/forms';
 
 /** @type {import('tailwindcss').Config} */
 export default {
+    darkMode: 'class',
     content: [
     "./resources/**/*.blade.php", // C'est cette ligne qui est CRUCIALE
     "./resources/**/*.js",
@@ -19,6 +20,12 @@ export default {
                     'soft': '#1565C0',   // Bleu Intermédiaire
                 },
             },
+            maxWidth: {
+                'card-lg': '900px', // ← ajoute (utilisé dans prendre.blade)
+            },
         },
     },
+
+    plugins: [forms],
+
 };
