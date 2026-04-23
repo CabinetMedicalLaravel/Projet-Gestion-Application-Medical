@@ -2,6 +2,8 @@
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
+
+            {{-- LEFT: Logo + Nav Links --}}
             <div class="flex">
                 <!-- Logo : Cabinet (Bleu Marine #0D47A1) Médical (Bleu Moyen #1E88E5) -->
                 <div class="shrink-0 flex items-center">

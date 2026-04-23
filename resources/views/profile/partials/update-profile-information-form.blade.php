@@ -1,3 +1,14 @@
+
+<style>
+.dark input, .dark textarea, .dark select {
+    background: #141e2e !important;
+    border-color: #233044 !important;
+    color: #e2e8f0 !important;
+}
+.dark label { color: #7a8fa6 !important; }
+.dark p.text-sm { color: #7a8fa6 !important; }
+.dark h2 { color: #e8eef8 !important; }
+</style>
 <section>
     <header>
         <h2 class="text-lg font-medium text-gray-900 flex items-center gap-2">

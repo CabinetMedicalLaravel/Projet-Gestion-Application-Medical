@@ -81,7 +81,7 @@
 
             <!-- SECTION 2 : CONTENU PRINCIPAL -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                
+
                 <!-- COLONNE GAUCHE -->
                 <div class="lg:col-span-2 space-y-8">
                     <!-- Carte : Mes prochains rendez-vous -->
@@ -169,7 +169,7 @@
                     </div>
                 </div>
             </div>
-            
+
         </div>
     </div>
 </x-app-layout>

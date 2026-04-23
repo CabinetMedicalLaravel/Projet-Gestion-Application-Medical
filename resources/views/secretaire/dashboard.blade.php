@@ -65,8 +65,9 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                <!-- COLONNE GAUCHE -->
-                <div class="lg:col-span-2 space-y-8">
+/* Main grid */
+.main-grid  { display:grid; grid-template-columns:1fr 340px; gap:1.5rem; }
+@media(max-width:1024px){ .main-grid { grid-template-columns:1fr; } }
 
                     <!-- Demandes en attente -->
                     <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
@@ -120,7 +121,13 @@
                             @endforelse
                         </div>
                     </div>
-                </div>
+                @empty
+                    <div style="text-align:center;padding:2rem 1rem;color:var(--sub);">
+                        <svg style="width:36px;height:36px;margin:0 auto .75rem;opacity:.4;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <p style="font-size:13px;">Aucune demande en attente.</p>
+                    </div>
+                @endforelse
+            </div>
 
                 <!-- COLONNE DROITE -->
                 <div class="space-y-8">
@@ -141,7 +148,17 @@
                                 <div class="ml-4"><p class="font-black text-[#0D47A1] group-hover:text-white transition text-sm">Registre Patients</p></div>
                             </a>
                         </div>
+                        @if($rdv['statut'] === 'confirme')
+                            <span class="badge badge-green"><span class="badge-dot"></span>Confirmé</span>
+                        @else
+                            <span class="badge badge-orange"><span class="badge-dot"></span>En attente</span>
+                        @endif
                     </div>
+                @empty
+                    <p style="font-size:13px;color:var(--sub);text-align:center;padding:1.5rem 0;">Aucun rendez-vous aujourd'hui.</p>
+                @endforelse
+            </div>
+        </div>
 
                     <!-- Activités & Notifications -->
                     <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8">
@@ -171,7 +188,22 @@
                         <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-[#1976D2] rounded-full opacity-30"></div>
                     </div>
                 </div>
+            </div>
 
+            {{-- Notifications --}}
+            <div class="panel">
+                <div class="panel-title" style="margin-bottom:1rem;">Notifications</div>
+                @forelse($notifications ?? [] as $notif)
+                    <div class="notif-item">
+                        <span class="notif-dot warning"></span>
+                        <div>
+                            <div class="notif-msg">{{ $notif['message'] }}</div>
+                            <div class="notif-date">{{ $notif['date'] }}</div>
+                        </div>
+                    </div>
+                @empty
+                    <p style="font-size:13px;color:var(--sub);text-align:center;padding:1rem 0;">Aucune notification.</p>
+                @endforelse
             </div>
         </div>
     </div>

@@ -39,13 +39,13 @@ class RegisteredUserController extends Controller
         $isPatient = $request->input('role', 'patient') === 'patient';
 
         $request->validate([
-            'name'        => ['required', 'string', 'max:255'],
-            'email'       => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            'password'    => ['required', 'confirmed', Rules\Password::defaults()],
-            'role'        => ['nullable', 'string', 'in:patient,staff'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'role' => ['nullable', 'string', 'in:patient,staff'],
             'access_code' => ['nullable', 'string', 'max:100'],
-            'indicatif'   => ['nullable', 'string', 'max:5'],
-            'telephone'   => [
+            'indicatif' => ['nullable', 'string', 'max:5'],
+            'telephone' => [
                 $isPatient ? 'required' : 'nullable',
                 'string',
                 'max:20',
@@ -53,12 +53,12 @@ class RegisteredUserController extends Controller
             ],
         ], [
             'telephone.required' => 'Le numéro de téléphone est obligatoire pour les patients.',
-            'telephone.regex'    => 'Le numéro de téléphone ne doit contenir que des chiffres.',
-            'telephone.max'      => 'Le numéro de téléphone est trop long.',
+            'telephone.regex' => 'Le numéro de téléphone ne doit contenir que des chiffres.',
+            'telephone.max' => 'Le numéro de téléphone est trop long.',
         ]);
 
         // ── 2. Détermination du rôle ─────────────────────────────────────────
-        $role          = 'patient';
+        $role = 'patient';
         $submittedRole = $request->input('role', 'patient');
         $submittedCode = trim($request->input('access_code', ''));
 
@@ -67,13 +67,13 @@ class RegisteredUserController extends Controller
 
             foreach ($this->accessCodes as $roleName => $validCode) {
                 if ($submittedCode === $validCode) {
-                    $role    = $roleName;
+                    $role = $roleName;
                     $matched = true;
                     break;
                 }
             }
 
-            if (! $matched) {
+            if (!$matched) {
                 return back()
                     ->withInput($request->except('password', 'password_confirmation', 'access_code'))
                     ->withErrors(['access_code' => 'Le code d\'accès est incorrect. Veuillez contacter l\'administrateur.']);
@@ -84,16 +84,16 @@ class RegisteredUserController extends Controller
         $telephone = null;
         if ($role === 'patient' && $request->filled('telephone')) {
             $indicatif = $request->input('indicatif', '+212');
-            $numero    = preg_replace('/\s+/', '', $request->input('telephone'));
+            $numero = preg_replace('/\s+/', '', $request->input('telephone'));
             $telephone = $indicatif . $numero;
         }
 
         // ── 4. Création de l'utilisateur ─────────────────────────────────────
         $user = User::create([
-            'name'      => $request->name,
-            'email'     => $request->email,
-            'password'  => Hash::make($request->password),
-            'role'      => $role,
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => $role,
             'telephone' => $telephone,
         ]);
 
