@@ -1,22 +1,30 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\Auth\CompleteProfileController; // Importation ajoutée
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-
+use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ConsultationController;
-use App\Http\Controllers\PatientController;
 
 use Carbon\Carbon;
 use App\Models\Appointment;
+
 use App\Models\User;
 
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
+
+// ── 0. PAGE D'ACCUEIL PUBLIQUE ──────────────────────────────────────────
 Route::get('/', function () {
     if (Auth::check()) return redirect('/dashboard');
     return view('welcome');
     
 });
+
 
  
 
@@ -30,6 +38,18 @@ Route::get('/consultations', [ConsultationController::class, 'index'])->name('co
 
 Route::get('/consultation/pdf/{id}', [ConsultationController::class, 'generatePDF'])
      ->name('consultation.pdf');
+
+
+Route::get('/', function () {
+    // On récupère uniquement les utilisateurs qui sont des médecins
+    $medecins = User::where('role', 'medecin')->get();
+
+    return view('welcome', [
+        'medecins' => $medecins
+    ]);
+});
+
+// ── 1. ROUTE DE REDIRECTION (Point d'entrée après Login) ───────────────
 
 Route::middleware(['auth', 'verified'])->get('/dashboard', function () {
     return match (Auth::user()->role) {
@@ -66,42 +86,18 @@ function getNotifications(string $role, int $userId): array {
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    // ── PATIENT DASHBOARD ────────────────────────────────────────────────
+    // --- SPÉCIALITÉ MÉDECIN (Ajouté) ---
+    // Cette page s'affiche juste après l'inscription du médecin
+    Route::get('/complete-profile', [CompleteProfileController::class, 'show'])->name('complete-profile.show');
+    Route::post('/complete-profile', [CompleteProfileController::class, 'store'])->name('complete-profile.store');
+
+    // --- ESPACE PATIENT ---
     Route::get('/patient/dashboard', function () {
         if (Auth::user()->role !== 'patient') abort(403);
         $user = Auth::user();
-
-        // Auto-expire past pending appointments
-        Appointment::where('patient_id', $user->id)
-            ->where('status', 'en_attente')
-            ->where('appointment_date', '<', Carbon::now())
-            ->update(['status' => 'annule']);
-
-        $rdvs = Appointment::with('doctor')
-            ->where('patient_id', $user->id)
-            ->whereIn('status', ['en_attente', 'confirme'])
-            ->orderBy('appointment_date')
-            ->get();
-
-        $rdv = $rdvs->map(function ($r) {
-            $date = Carbon::parse($r->appointment_date);
-            return [
-                'jour'      => $date->format('d'),
-                'mois'      => $date->translatedFormat('M'),
-                'heure'     => $date->format('H:i'),
-                'medecin'   => 'Dr. ' . ($r->doctor->name ?? '—'),
-                'specialite'=> $r->doctor->specialite ?? 'Médecine générale',
-                'statut'    => match($r->status) {
-                    'en_attente' => 'En attente',
-                    'confirme'   => 'Confirmé',
-                    default      => 'À venir',
-                },
-            ];
-        })->toArray();
-
         return view('dashboard', [
             'patient'       => $user,
-            'rdv'           => $rdv,
+            'rdv'           =>[],
             'notifications' => getNotifications('patient', $user->id),
             'nbOrdonnances' => 0,
         ]);
@@ -110,7 +106,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
 
+
     // ── MÉDECIN DASHBOARD ────────────────────────────────────────────────
+
+
+    // Page d'accueil patient connecté (après clic sur le logo)
+    Route::get('/patient/accueil', function () {
+        if (Auth::user()->role !== 'patient') abort(403);
+
+        return view('patient.accueil');
+    })->name('patient.accueil');
+
+    // --- ESPACE MÉDECIN ---
 
     Route::get('/medecin/dashboard', function () {
         if (Auth::user()->role !== 'medecin') abort(403);
@@ -169,55 +176,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ]);
     })->name('medecin.dashboard');
 
-    // ── MÉDECIN AGENDA ───────────────────────────────────────────────────
-    Route::get('/medecin/agenda', function () {
-        if (Auth::user()->role !== 'medecin') abort(403);
-        $query = Appointment::with('patient')->where('doctor_id', Auth::id())->orderBy('appointment_date','desc');
-        if (request('statut')) $query->where('status', request('statut'));
-        if (request('date'))   $query->whereDate('appointment_date', request('date'));
-        $rdvs = $query->get();
-        return view('medecin.agenda', compact('rdvs'));
-    })->name('medecin.agenda');
+    // --- ESPACE SECRÉTAIRE ---
+Route::get('/secretaire/dashboard', function () {
+    if (Auth::user()->role !== 'secretaire') abort(403);
 
-    // ── SECRÉTAIRE DASHBOARD ─────────────────────────────────────────────
-    Route::get('/secretaire/dashboard', function () {
-        if (Auth::user()->role !== 'secretaire') abort(403);
-        $today = Carbon::today();
 
-        $rdvAujourdhuiRaw = Appointment::with(['patient','doctor'])
-            ->whereDate('appointment_date', $today)->orderBy('appointment_date')->get();
 
-        $rdvEnAttenteRaw = Appointment::with(['patient','doctor'])
-            ->where('status', 'en_attente')->orderBy('appointment_date')->take(10)->get();
-
-        $nbNouveauxPatients = User::where('role','patient')->where('created_at','>=',Carbon::now()->startOfMonth())->count();
-        $nbMedecins         = User::where('role','medecin')->count();
-
-        $rdvAujourdhui = $rdvAujourdhuiRaw->map(fn($r) => [
-            'heure'   => Carbon::parse($r->appointment_date)->format('H:i'),
-            'patient' => $r->patient_display_name,
-            'medecin' => 'Dr. ' . ($r->doctor->name ?? '—'),
-            'statut'  => $r->status,
-        ])->toArray();
-
-        $rdvEnAttente = $rdvEnAttenteRaw->map(fn($r) => [
-            'patient' => $r->patient_display_name,
-            'medecin' => 'Dr. ' . ($r->doctor->name ?? '—'),
-            'date'    => Carbon::parse($r->appointment_date)->translatedFormat('d M Y'),
-            'heure'   => Carbon::parse($r->appointment_date)->format('H:i'),
-            'id'      => $r->id,
-        ])->toArray();
-
-        return view('secretaire.dashboard', [
-            'nbRdvAujourdhui'    => $rdvAujourdhuiRaw->count(),
-            'nbEnAttente'        => $rdvEnAttenteRaw->count(),
-            'nbNouveauxPatients' => $nbNouveauxPatients,
-            'nbMedecins'         => $nbMedecins,
-            'rdvAujourdhui'      => $rdvAujourdhui,
-            'rdvEnAttente'       => $rdvEnAttente,
-            'notifications'      => getNotifications('secretaire', Auth::id()),
-        ]);
-    })->name('secretaire.dashboard');
+    return view('secretaire.dashboard', [
+        'nbRdvAujourdhui'    => 0, // Garde tes variables actuelles
+        'nbEnAttente'        => 0,
+        'nbNouveauxPatients' => 0,
+        'nbMedecins'         => 0,
+        'rdvEnAttente'       => [],
+        'rdvAujourdhui'      => [],
+        'notifications'      => [],
+    ]);
+})->name('secretaire.dashboard');
 
     // ── MODULE RDV ───────────────────────────────────────────────────────
     Route::get('/rdv/calendrier',              [AppointmentController::class, 'calendrier'])->name('rdv.calendrier');

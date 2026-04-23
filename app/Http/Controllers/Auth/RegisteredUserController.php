@@ -16,13 +16,10 @@ class RegisteredUserController extends Controller
 {
     /**
      * Les codes d'accès secrets par rôle.
-     * ⚠️  En production, utilisez le fichier .env :
-     *   ACCESS_CODE_MEDECIN=MEDECIN2026
-     *   ACCESS_CODE_SECRETAIRE=SECRETAIRE2026
      */
     private array $accessCodes = [
-        'medecin' => 'MEDECIN2026',      // ou env('ACCESS_CODE_MEDECIN')
-        'secretaire' => 'SECRETAIRE2026',   // ou env('ACCESS_CODE_SECRETAIRE')
+        'medecin'    => 'MEDECIN2026',      
+        'secretaire' => 'SECRETAIRE2026',   
     ];
 
     /**
@@ -35,8 +32,6 @@ class RegisteredUserController extends Controller
 
     /**
      * Traiter la demande d'inscription.
-     *
-     * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request): RedirectResponse
     {
@@ -102,25 +97,30 @@ class RegisteredUserController extends Controller
             'telephone' => $telephone,
         ]);
 
-        // ── 4b. Si médecin, créer la fiche medecins ──────────────────────────
-        if ($role === 'medecin') {
-            \App\Models\Medecin::create([
+
+        // ── AJOUTE CECI ICI ───────────────────────────────
+        if ($role === 'secretaire') {
+            \App\Models\Secretaire::create([
                 'user_id' => $user->id,
-                'specialite' => '',
-                'numero_ordre' => '',
+                'numero_bureau' => 'Non défini', // Valeur par défaut
             ]);
         }
-
+        // ──────────────────────────────────────────────────
         // ── 5. Événement + connexion automatique ─────────────────────────────
         event(new Registered($user));
 
         Auth::login($user);
 
-        // ── 6. Redirection selon le rôle ─────────────────────────────────────
+        // ── 6. Redirection selon le rôle (MODIFIÉ) ───────────────────────────
         return match ($role) {
-            'medecin' => redirect()->route('medecin.dashboard'),
-            'secretaire' => redirect()->route('secretaire.dashboard'),
-            default => redirect()->route('dashboard'),
+            // Le médecin est envoyé vers la page pour compléter sa spécialité
+            'medecin'    => redirect()->route('complete-profile.show'), 
+            
+            // La secrétaire va directement à son dashboard
+            'secretaire' => redirect()->route('secretaire.dashboard'), 
+            
+            // Le patient va à son dashboard par défaut
+            default      => redirect()->route('dashboard'),
         };
     }
 }
