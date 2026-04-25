@@ -38,6 +38,9 @@
     .divider { display: flex; align-items: center; gap: .75rem; margin: 1.25rem 0; }
     .divider::before, .divider::after { content: ''; flex: 1; height: 0.5px; background: #e5e7eb; }
     .divider span { font-size: 12px; color: #9ca3af; }
+    .slot-group-title { font-size: 11px; font-weight: 700; color: #1565C0; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+    .mb-4 { margin-bottom: 1rem; }
+    .mt-4 { margin-top: 1rem; }
 
     /* Dark mode */
     .dark .rdv-page { background: #111827; }
@@ -63,7 +66,7 @@
 <div class="rdv-wrap">
 
     <div class="page-header">
-        <a href="{{ route('rdv.mes-rdv') }}" class="page-back">
+        <a href="{{ route('dashboard') }}" class="page-back">
             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
             Retour à mes rendez-vous
         </a>
@@ -124,21 +127,45 @@
                     <span class="step-badge">3</span> Choisir un créneau horaire
                 </div>
                 <input type="hidden" name="heure" id="heure-hidden" value="{{ old('heure', $preselectedHeure) }}">
-                <div class="slots-grid" id="creneaux-grid">
-                    @forelse($creneauxDisponibles as $c)
-                        <button type="button"
-                                onclick="selectCreneau(this, '{{ $c }}')"
-                                class="slot-btn {{ old('heure', $preselectedHeure) === $c ? 'selected' : '' }}">
-                            {{ $c }}
-                        </button>
-                    @empty
-                        <p style="grid-column:span 4; font-size:13px; color:#9ca3af; font-style:italic; padding:.5rem 0; opacity:.8;">
-                            @if($doctorId) Aucun créneau disponible pour cette date.
-                            @else Sélectionnez un médecin et une date pour voir les créneaux.
-                            @endif
-                        </p>
-                    @endforelse
-                </div>
+                
+                @if(count($creneauxDisponibles) > 0)
+                    @php
+                        $matin = array_filter($creneauxDisponibles, fn($c) => (int)substr($c, 0, 2) < 13);
+                        $aprem = array_filter($creneauxDisponibles, fn($c) => (int)substr($c, 0, 2) >= 13);
+                    @endphp
+
+                    @if(count($matin) > 0)
+                        <p class="slot-group-title">Matin</p>
+                        <div class="slots-grid mb-4">
+                            @foreach($matin as $c)
+                                <button type="button"
+                                        onclick="selectCreneau(this, '{{ $c }}')"
+                                        class="slot-btn {{ old('heure', $preselectedHeure) === $c ? 'selected' : '' }}">
+                                    {{ $c }}
+                                </button>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    @if(count($aprem) > 0)
+                        <p class="slot-group-title mt-4">Après-midi</p>
+                        <div class="slots-grid">
+                            @foreach($aprem as $c)
+                                <button type="button"
+                                        onclick="selectCreneau(this, '{{ $c }}')"
+                                        class="slot-btn {{ old('heure', $preselectedHeure) === $c ? 'selected' : '' }}">
+                                    {{ $c }}
+                                </button>
+                            @endforeach
+                        </div>
+                    @endif
+                @else
+                    <div class="form-input" style="grid-column:span 4; padding-left: 1rem; color:#6b7280; font-style:italic; text-align:center; display:flex; align-items:center; justify-content:center;">
+                        @if($doctorId) Aucun créneau disponible pour cette date.
+                        @else Sélectionnez un médecin et une date pour voir les créneaux.
+                        @endif
+                    </div>
+                @endif
                 @error('heure')<span class="field-err">{{ $message }}</span>@enderror
             </div>
 

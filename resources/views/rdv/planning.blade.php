@@ -596,14 +596,14 @@
                                 </div>
                                 <div style="display:flex;gap:.4rem;flex-shrink:0;">
                                     @if($rdv->status === 'en_attente')
-                                        <form method="POST" action="{{ route('rdv.statut', $rdv) }}">
+                                        <form method="POST" action="{{ route('rdv.update-status', $rdv) }}">
                                             @csrf @method('PATCH')
                                             <input type="hidden" name="status" value="confirme">
                                             <button type="submit" class="btn-sm btn-confirm">Confirmer</button>
                                         </form>
                                     @elseif($rdv->status === 'confirme')
                                         @if($rdv->canBeMarkedDone())
-                                            <form method="POST" action="{{ route('rdv.statut', $rdv) }}">
+                                            <form method="POST" action="{{ route('rdv.update-status', $rdv) }}">
                                                 @csrf @method('PATCH')
                                                 <input type="hidden" name="status" value="termine">
                                                 <button type="submit" class="btn-sm btn-done">Terminer</button>
@@ -614,7 +614,7 @@
                                     @endif
                                     @if(in_array($rdv->status, ['en_attente', 'confirme']))
                                         @if($rdv->canBeCancelledByStaff())
-                                            <form method="POST" action="{{ route('rdv.statut', $rdv) }}"
+                                            <form method="POST" action="{{ route('rdv.update-status', $rdv) }}"
                                                 onsubmit="return confirm('Annuler ?')">
                                                 @csrf @method('PATCH')
                                                 <input type="hidden" name="status" value="annule">

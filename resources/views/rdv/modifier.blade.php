@@ -62,7 +62,7 @@
 <div class="rdv-page">
 <div class="rdv-wrap">
 
-    <a href="{{ route('rdv.mes-rdv') }}" class="page-back">
+    <a href="{{ route('dashboard') }}" class="page-back">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
         Retour à mes rendez-vous
     </a>
@@ -86,7 +86,7 @@
         @endif
 
         <form method="POST" action="{{ route('rdv.update', $appointment) }}">
-            @csrf @method('PUT')
+            @csrf @method('PATCH')
 
             {{-- Nouvelle date --}}
             <div class="form-field">
@@ -132,7 +132,7 @@
             </div>
 
             <button type="submit" class="btn-primary">Enregistrer les modifications</button>
-            <a href="{{ route('rdv.mes-rdv') }}" class="btn-secondary">Annuler — retour sans modifier</a>
+            <a href="{{ route('dashboard') }}" class="btn-secondary">Annuler — retour sans modifier</a>
         </form>
     </div>
 </div>

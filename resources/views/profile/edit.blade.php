@@ -10,24 +10,31 @@
             
             <!-- Section Informations Personnelles -->
             <div class="p-8 sm:p-12 bg-white shadow-xl shadow-gray-100 rounded-[2rem] border border-gray-100">
+
                 <div class="max-w-xl">
                     @include('profile.partials.update-profile-information-form')
                 </div>
             </div>
 
+
             <!-- Section Mot de Passe -->
             <div class="p-8 sm:p-12 bg-white shadow-xl shadow-gray-100 rounded-[2rem] border border-gray-100">
+
                 <div class="max-w-xl">
                     @include('profile.partials.update-password-form')
                 </div>
             </div>
 
+
             <!-- Section Suppression (Optionnel) -->
             <div class="p-8 sm:p-12 bg-white shadow-xl shadow-gray-100 rounded-[2rem] border border-red-50">
+
                 <div class="max-w-xl">
                     @include('profile.partials.delete-user-form')
                 </div>
             </div>
         </div>
     </div>
+
 </x-app-layout>
+

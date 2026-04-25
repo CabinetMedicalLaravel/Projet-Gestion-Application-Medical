@@ -8,12 +8,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+
 use Illuminate\Support\Facades\Storage;
+
 
 class ProfileController extends Controller
 {
     /**
+
      * Afficher le formulaire de profil de l'utilisateur.
+
+     * Display the user's profile form.
+
      */
     public function edit(Request $request): View
     {
@@ -23,6 +29,7 @@ class ProfileController extends Controller
     }
 
     /**
+
      * Mettre à jour les informations du profil.
      */
     public function update(Request $request): RedirectResponse
@@ -68,11 +75,15 @@ class ProfileController extends Controller
         // 5. Sauvegarde finale
         $user->save();
 
+
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
     /**
+
      * Supprimer le compte de l'utilisateur.
+
+     * Delete the user's account.
      */
     public function destroy(Request $request): RedirectResponse
     {
@@ -82,10 +93,12 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
+
         // Supprimer la photo de profil du stockage avant de supprimer le compte
         if ($user->profile_photo) {
             Storage::disk('public')->delete($user->profile_photo);
         }
+
 
         Auth::logout();
 
@@ -96,4 +109,5 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
 }

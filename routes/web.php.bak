@@ -1,0 +1,132 @@
+<?php
+
+use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+// ── 1. ROUTE DE REDIRECTION (Point d'entrée après Login/Vérification) ──
+// Cette route sert de "chef d'orchestre" pour envoyer chaque rôle au bon endroit.
+Route::middleware(['auth', 'verified'])->get('/dashboard', function () {
+    $user = Auth::user();
+
+    return match ($user->role) {
+        'medecin'    => redirect()->route('medecin.dashboard'),
+        'secretaire' => redirect()->route('secretaire.dashboard'),
+        'patient'    => redirect()->route('patient.dashboard'),
+        default      => redirect('/'),
+    };
+})->name('dashboard');
+
+
+// ── 2. GROUPES DE ROUTES PROTÉGÉS PAR RÔLE ─────────────────────────────
+Route::middleware(['auth', 'verified'])->group(function () {
+
+    // --- ESPACE PATIENT ---
+    Route::get('/patient/dashboard', function () {
+        // Optionnel : Sécurité supplémentaire si pas de middleware global
+        if (Auth::user()->role !== 'patient') abort(403); 
+
+        return view('dashboard', [
+            'patient'       => Auth::user(),
+            'rdv'           => [],
+            'notifications' => [],
+            'nbOrdonnances' => 0,
+        ]);
+    })->name('patient.dashboard');
+
+    // --- ESPACE MÉDECIN ---
+    Route::get('/medecin/dashboard', function () {
+        if (Auth::user()->role !== 'medecin') abort(403);
+
+        return view('medecin.dashboard', [
+            'nbRdvAujourdhui'  => 0,
+            'nbPatients'       => 0,
+            'nbEnAttente'      => 0,
+            'nbOrdonnances'    => 0,
+            'rdvAujourdhui'    => [],
+            'derniersPatients' => [],
+            'notifications'    => [],
+        ]);
+    })->name('medecin.dashboard');
+
+    // --- ESPACE SECRÉTAIRE ---
+    Route::get('/secretaire/dashboard', function () {
+        if (Auth::user()->role !== 'secretaire') abort(403);
+
+        return view('secretaire.dashboard', [
+            'nbRdvAujourdhui'    => 0,
+            'nbEnAttente'        => 0,
+            'nbNouveauxPatients' => 0,
+            'nbMedecins'         => 0,
+            'rdvEnAttente'       => [],
+            'rdvAujourdhui'      => [],
+            'notifications'      => [],
+        ]);
+    })->name('secretaire.dashboard');
+
+});
+
+// ── 3. PROFIL (Commun à tous les utilisateurs connectés) ───────────────
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__.'/auth.php';
+// Routes Secrétaire - Patients
+Route::middleware(['auth', 'role:secretaire'])->prefix('secretaire')->name('secretaire.')->group(function () {
+    Route::get('/patients', [App\Http\Controllers\PatientSecretaireController::class, 'index'])->name('patients');
+    Route::get('/patients/create', [App\Http\Controllers\PatientSecretaireController::class, 'create'])->name('patients.create');
+    Route::post('/patients', [App\Http\Controllers\PatientSecretaireController::class, 'store'])->name('patients.store');
+    Route::get('/patients/{patient}', [App\Http\Controllers\PatientSecretaireController::class, 'show'])->name('patients.show');
+    Route::get('/patients/{patient}/edit', [App\Http\Controllers\PatientSecretaireController::class, 'edit'])->name('patients.edit');
+    Route::put('/patients/{patient}', [App\Http\Controllers\PatientSecretaireController::class, 'update'])->name('patients.update');
+    Route::delete('/patients/{patient}', [App\Http\Controllers\PatientSecretaireController::class, 'destroy'])->name('patients.destroy');
+});
+Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+
+// Routes Admin - Utilisateurs
+Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+    Route::get('/users', [App\Http\Controllers\UserController::class, 'index'])->name('users');
+    Route::get('/users/create', [App\Http\Controllers\UserController::class, 'create'])->name('users.create');
+    Route::post('/users', [App\Http\Controllers\UserController::class, 'store'])->name('users.store');
+    Route::get('/users/{user}/edit', [App\Http\Controllers\UserController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{user}', [App\Http\Controllers\UserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [App\Http\Controllers\UserController::class, 'destroy'])->name('users.destroy');
+});
+
+// Routes Admin - Créneaux
+Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+    Route::get('/creneaux', [App\Http\Controllers\CreneauController::class, 'index'])->name('creneaux');
+    Route::post('/creneaux', [App\Http\Controllers\CreneauController::class, 'store'])->name('creneaux.store');
+    Route::delete('/creneaux/{creneau}', [App\Http\Controllers\CreneauController::class, 'destroy'])->name('creneaux.destroy');
+    Route::get('/creneaux/{creneau}/toggle', [App\Http\Controllers\CreneauController::class, 'toggle'])->name('creneaux.toggle');
+});
+Route::get('/admin/dashboard', [App\Http\Controllers\AdminDashboardController::class, 'index'])->name('admin.dashboard');
+
+// Routes Admin - Gestion complète
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
+    // Gestion des patients
+    Route::resource('patients', PatientSecretaireController::class);
+    
+    // Gestion des rendez-vous
+    Route::get('/rendez-vous', [App\Http\Controllers\RendezVousController::class, 'index'])->name('rendez-vous');
+    Route::get('/rendez-vous/create', [App\Http\Controllers\RendezVousController::class, 'create'])->name('rendez-vous.create');
+    Route::post('/rendez-vous', [App\Http\Controllers\RendezVousController::class, 'store'])->name('rendez-vous.store');
+    Route::get('/rendez-vous/{id}/edit', [App\Http\Controllers\RendezVousController::class, 'edit'])->name('rendez-vous.edit');
+    Route::put('/rendez-vous/{id}', [App\Http\Controllers\RendezVousController::class, 'update'])->name('rendez-vous.update');
+    Route::delete('/rendez-vous/{id}', [App\Http\Controllers\RendezVousController::class, 'destroy'])->name('rendez-vous.destroy');
+    Route::patch('/rendez-vous/{id}/annuler', [App\Http\Controllers\RendezVousController::class, 'annuler'])->name('rendez-vous.annuler');
+    Route::patch('/rendez-vous/{id}/debloquer', [App\Http\Controllers\RendezVousController::class, 'debloquer'])->name('rendez-vous.debloquer');
+});

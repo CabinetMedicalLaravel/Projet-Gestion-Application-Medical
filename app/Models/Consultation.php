@@ -27,7 +27,12 @@ class Consultation extends Model
         return $this->hasOne(Ordonnance::class);
     }
     public function user()
-{
-    return $this->belongsTo(User::class);
-}
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function medecin()
+    {
+        return $this->belongsTo(User::class, 'medecin_id');
+    }
 }

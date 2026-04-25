@@ -14,12 +14,7 @@ return new class extends Migration
     Schema::table('consultations', function (Blueprint $table) {
         
         // 1. On essaie de supprimer l'ancienne clé étrangère si elle existe
-        // Note : Le nom est souvent 'consultations_patient_id_foreign'
-        try {
-            $table->dropForeign(['patient_id']);
-        } catch (\Exception $e) {
-            // On ignore si elle n'existe pas
-        }
+        // supprimé car Schema::table différé empêche le try/catch de fonctionner correctement
 
         // 2. On change la destination de la clé vers la table 'users'
         $table->foreign('patient_id')

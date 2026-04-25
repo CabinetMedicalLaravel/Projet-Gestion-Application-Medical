@@ -1,5 +1,14 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" 
+      x-data="{ dark: localStorage.getItem('theme') === 'dark' }"
+      x-init="
+        $watch('dark', v => {
+          localStorage.setItem('theme', v ? 'dark' : 'light');
+          document.documentElement.classList.toggle('dark', v);
+        });
+        document.documentElement.classList.toggle('dark', dark);
+      "
+      :class="{ 'dark': dark }">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,7 +18,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Figtree', sans-serif; background: #FFFFFF; color: #0D47A1; }
+        body { font-family: 'Figtree', sans-serif; background: #FFFFFF; color: #0D47A1; transition: background 0.3s, color 0.3s; }
+        body.dark { background: #0f172a; color: #f1f5f9; }
 
         /* NAVBAR */
         .navbar {
@@ -24,9 +34,13 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            transition: all 0.3s;
         }
+        .dark .navbar { background: rgba(15, 23, 42, 0.9); border-bottom: 1px solid #1e293b; }
+
         .navbar-logo { font-size: 22px; font-weight: 800; text-decoration: none; letter-spacing: -0.5px; }
         .navbar-logo .blue-dark { color: #0D47A1; } 
+        .dark .navbar-logo .blue-dark { color: #60A5FA; }
         .navbar-logo .blue-light { color: #1E88E5; } 
         
         .navbar-links { display: flex; gap: 14px; align-items: center; }
@@ -35,6 +49,7 @@
             text-decoration: none; font-size: 14px; font-weight: 600;
             color: #1565C0; background: white; transition: all 0.2s;
         }
+        .dark .btn-login { background: #1e293b; color: #60A5FA; border-color: #334155; }
         .btn-login:hover { background: #F1F8FE; border-color: #1E88E5; }
         
         .btn-register {
@@ -46,6 +61,12 @@
         }
         .btn-register:hover { transform: translateY(-1px); box-shadow: 0 6px 15px rgba(13, 71, 161, 0.3); }
 
+        /* DARK MODE TOGGLE */
+        .theme-toggle {
+            cursor: pointer; padding: 8px; border-radius: 10px; background: #F1F8FE; color: #1976D2; border: 1px solid #BBDEFB; display: flex; align-items: center; transition: all 0.2s;
+        }
+        .dark .theme-toggle { background: #1e293b; color: #60A5FA; border-color: #334155; }
+
         /* HERO SECTION */
         .hero { max-width: 1000px; margin: 100px auto 80px; text-align: center; padding: 0 2rem; }
         .hero-badge {
@@ -54,13 +75,17 @@
             border-radius: 25px; margin-bottom: 24px; border: 1px solid #90CAF9;
             text-transform: uppercase; letter-spacing: 0.5px;
         }
+        .dark .hero-badge { background: #1e293b; color: #60A5FA; border-color: #334155; }
+        
         .hero h1 { font-size: 56px; font-weight: 800; color: #0D47A1; line-height: 1.1; margin-bottom: 24px; letter-spacing: -1.5px; }
+        .dark .hero h1 { color: #f1f5f9; }
         .hero h1 span { 
             background: linear-gradient(to right, #1565C0, #2196F3);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         .hero p { font-size: 19px; color: #475569; line-height: 1.6; max-width: 650px; margin: 0 auto 40px; }
+        .dark .hero p { color: #94a3b8; }
         
         .hero-btns { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
         .btn-primary {
@@ -76,6 +101,7 @@
             border: 2px solid #E3F2FD; border-radius: 14px; text-decoration: none;
             font-size: 16px; font-weight: 700; transition: all 0.2s;
         }
+        .dark .btn-secondary { background: #1e293b; color: #60A5FA; border-color: #334155; }
         .btn-secondary:hover { background: #F8FAFC; border-color: #90CAF9; }
 
         /* STATS */
@@ -84,21 +110,29 @@
             margin: 0 auto 100px; padding: 40px 2rem; background: #fff;
             border-radius: 30px; border: 1px solid #E3F2FD;
             box-shadow: 0 20px 50px rgba(13, 71, 161, 0.05);
+            transition: all 0.3s;
         }
+        .dark .stats { background: #1e293b; border-color: #334155; }
         .stat-number { font-size: 38px; font-weight: 800; color: #2196F3; }
         .stat-label { font-size: 14px; color: #64748B; font-weight: 600; text-transform: uppercase; margin-top: 5px; }
+        .dark .stat-label { color: #94a3b8; }
 
         /* FEATURES */
         .features { max-width: 1200px; margin: 0 auto 100px; padding: 0 2rem; }
         .features-title { text-align: center; font-size: 36px; font-weight: 800; color: #0D47A1; margin-bottom: 12px; }
+        .dark .features-title { color: #f1f5f9; }
         .features-sub { text-align: center; font-size: 16px; color: #64748B; margin-bottom: 50px; }
+        .dark .features-sub { color: #94a3b8; }
         
         .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
         .feature-card { 
             background: white; border: 1px solid #F1F5F9; border-radius: 24px; padding: 35px; 
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
         }
+        .dark .feature-card { background: #1e293b; border-color: #334155; }
         .feature-card:hover { transform: translateY(-5px); border-color: #90CAF9; box-shadow: 0 15px 30px rgba(21, 101, 192, 0.05); }
+        .dark .feature-card h3 { color: white; }
+        .dark .feature-card p { color: #94a3b8; }
         
         .feature-icon { 
             width: 56px; height: 56px; border-radius: 16px; 
@@ -107,17 +141,21 @@
         }
 
         /* ROLES SECTION */
-        .roles { background: #F0F7FF; padding: 80px 2rem; margin-bottom: 80px; border-radius: 50px; margin-left: 20px; margin-right: 20px;}
+        .roles { background: #F0F7FF; padding: 80px 2rem; margin-bottom: 80px; border-radius: 50px; margin-left: 20px; margin-right: 20px; transition: all 0.3s;}
+        .dark .roles { background: #1e293b; }
         .roles-inner { max-width: 1000px; margin: 0 auto; }
         .roles-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
         .role-card { 
             background: white; border-radius: 24px; padding: 30px 20px; text-align: center; 
             border: 2px solid transparent; transition: all 0.3s;
         }
+        .dark .role-card { background: #0f172a; }
         .role-card:hover { border-color: #1E88E5; transform: scale(1.03); }
         .role-icon { font-size: 35px; margin-bottom: 15px; }
         .role-card h4 { font-size: 17px; font-weight: 700; margin-bottom: 8px; color: #0D47A1; }
+        .dark .role-card h4 { color: white; }
         .role-card p { font-size: 13px; color: #64748B; line-height: 1.5; }
+        .dark .role-card p { color: #94a3b8; }
 
         /* DOCTORS COMPACT SECTION */
         .doctors-section { max-width: 1000px; margin: 60px auto 100px; padding: 0 2rem; }
@@ -126,11 +164,14 @@
             border-radius: 20px; display: flex; align-items: center; gap: 12px; 
             transition: 0.3s; box-shadow: 0 4px 15px rgba(13, 71, 161, 0.03);
         }
+        .dark .doctor-card { background: #1e293b; border-color: #334155; }
         .doctor-card:hover { border-color: #1E88E5; transform: translateX(5px); }
         .doctor-img { width: 50px; height: 50px; border-radius: 15px; object-fit: cover; border: 2px solid #90CAF9; }
         .doctor-placeholder { width: 50px; height: 50px; border-radius: 15px; background: #E3F2FD; color: #1565C0; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; border: 2px solid #90CAF9; }
         .doctor-info h4 { font-size: 15px; font-weight: 700; color: #0D47A1; margin: 0; }
+        .dark .doctor-info h4 { color: white; }
         .doctor-info p { font-size: 12px; color: #1976D2; font-weight: 600; margin: 2px 0 0; }
+        .dark .doctor-info p { color: #60A5FA; }
 
         /* CTA */
         .cta { max-width: 800px; margin: 0 auto 100px; text-align: center; padding: 60px 2rem; background: linear-gradient(135deg, #0D47A1, #1976D2); border-radius: 40px; color: white; }
@@ -139,7 +180,8 @@
         .cta .btn-white { padding: 16px 40px; background: white; color: #0D47A1; border-radius: 15px; text-decoration: none; font-weight: 700; transition: 0.2s; }
         .cta .btn-white:hover { background: #E3F2FD; transform: scale(1.05); }
 
-        .footer { padding: 40px 2rem; text-align: center; color: #94A3B8; font-size: 14px; border-top: 1px solid #F1F5F9; }
+        .footer { padding: 40px 2rem; text-align: center; color: #94A3B8; font-size: 14px; border-top: 1px solid #F1F5F9; transition: all 0.3s;}
+        .dark .footer { border-top-color: #334155; background: #0f172a; }
         .footer span { color: #1565C0; font-weight: 700; }
     </style>
 </head>
@@ -151,6 +193,12 @@
             <span class="blue-dark">Cabinet</span><span class="blue-light">Médical</span>
         </a>
         <div class="navbar-links">
+            <!-- Theme Toggle -->
+            <button @click="dark = !dark" class="theme-toggle">
+                <span x-show="!dark">☀️</span>
+                <span x-show="dark" style="display:none;" x-cloak>🌙</span>
+            </button>
+
             @auth
                 <a href="{{ route('dashboard') }}" class="btn-login">Mon Espace</a>
                 <form method="POST" action="{{ route('logout') }}" style="display:inline;">

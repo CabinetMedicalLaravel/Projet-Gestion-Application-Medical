@@ -12,8 +12,8 @@
             </div>
         </div>
 
-        <h1 class="text-3xl font-black text-[#0D47A1] text-center mb-2">Bienvenue</h1>
-        <p class="text-[#64748B] text-center font-medium mb-8">Connectez-vous à votre compte CabinetMédical</p>
+        <h1 class="text-3xl font-black text-[#0D47A1] dark:text-blue-400 text-center mb-2">Bienvenue</h1>
+        <p class="text-[#64748B] dark:text-slate-400 text-center font-medium mb-8">Connectez-vous à votre compte CabinetMédical</p>
 
         @if ($errors->any())
             <div class="mb-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm font-bold rounded-lg">
@@ -26,16 +26,16 @@
 
             {{-- Champ Email --}}
             <div class="space-y-2">
-                <label for="email" class="text-xs font-black text-[#0D47A1] uppercase tracking-widest ml-1">Adresse e-mail</label>
+                <label for="email" class="text-xs font-black text-[#0D47A1] dark:text-blue-400 uppercase tracking-widest ml-1">Adresse e-mail</label>
                 <div class="relative group">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#1E88E5]">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#1E88E5] dark:text-blue-500">
                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="2" y="4" width="20" height="16" rx="2"/>
                             <path d="m2 7 10 7 10-7"/>
                         </svg>
                     </div>
                     <input id="email" name="email" type="email"
-                        class="block w-full pl-11 pr-4 py-4 bg-[#F8FAFC] border-none rounded-2xl text-sm focus:ring-2 focus:ring-[#2196F3] transition-all"
+                        class="block w-full pl-11 pr-4 py-4 bg-[#F8FAFC] dark:bg-[#141e2e] dark:text-white border-none rounded-2xl text-sm focus:ring-2 focus:ring-[#2196F3] transition-all"
                         placeholder="vous@exemple.com"
                         value="{{ old('email') }}"
                         required autofocus autocomplete="username" />
@@ -44,16 +44,16 @@
 
             {{-- Champ Mot de passe --}}
             <div class="space-y-2">
-                <label for="password" class="text-xs font-black text-[#0D47A1] uppercase tracking-widest ml-1">Mot de passe</label>
+                <label for="password" class="text-xs font-black text-[#0D47A1] dark:text-blue-400 uppercase tracking-widest ml-1">Mot de passe</label>
                 <div class="relative group">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#1E88E5]">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#1E88E5] dark:text-blue-500">
                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="3" y="11" width="18" height="11" rx="2"/>
                             <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                         </svg>
                     </div>
                     <input id="password" name="password" type="password"
-                        class="block w-full pl-11 pr-12 py-4 bg-[#F8FAFC] border-none rounded-2xl text-sm focus:ring-2 focus:ring-[#2196F3] transition-all"
+                        class="block w-full pl-11 pr-12 py-4 bg-[#F8FAFC] dark:bg-[#141e2e] dark:text-white border-none rounded-2xl text-sm focus:ring-2 focus:ring-[#2196F3] transition-all"
                         placeholder="••••••••"
                         required autocomplete="current-password" />
                     
@@ -87,13 +87,13 @@
 
             {{-- Séparateur --}}
             <div class="relative py-4">
-                <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-[#E2E8F0]"></div></div>
-                <div class="relative flex justify-center text-xs uppercase"><span class="bg-white px-4 font-bold text-[#94A3B8]">ou</span></div>
+                <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-[#E2E8F0] dark:border-slate-700"></div></div>
+                <div class="relative flex justify-center text-xs uppercase"><span class="bg-white dark:bg-[#1e293b] px-4 font-bold text-[#94A3B8]">ou</span></div>
             </div>
 
             {{-- Bouton créer un compte (Contour Bleu #1565C0) --}}
             @if (Route::has('register'))
-                <a href="{{ route('register') }}" class="block w-full text-center py-4 bg-white border-2 border-[#1565C0] text-[#1565C0] font-black uppercase tracking-widest rounded-2xl hover:bg-[#F1F8FE] transition">
+                <a href="{{ route('register') }}" class="block w-full text-center py-4 bg-white dark:bg-transparent border-2 border-[#1565C0] text-[#1565C0] font-black uppercase tracking-widest rounded-2xl hover:bg-[#F1F8FE] dark:hover:bg-slate-800 transition">
                     Créer un compte patient
                 </a>
             @endif

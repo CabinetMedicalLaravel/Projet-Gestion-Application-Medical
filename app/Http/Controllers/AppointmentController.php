@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Appointment;
 use App\Models\User;
 use App\Mail\RdvConfirmeMail;
+use App\Models\Creneau;
+use App\Services\SlotGeneratorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -12,12 +14,17 @@ use Carbon\Carbon;
 
 class AppointmentController extends Controller
 {
-    private array $creneaux = [
-        '08:00','08:20','08:40','09:00','09:20','09:40',
-        '10:00','10:20','10:40','11:00','11:20','11:40',
-        '14:00','14:20','14:40','15:00','15:20','15:40',
-        '16:00','16:20','16:40','17:00','17:20','17:40',
-    ];
+    protected $slotService;
+
+    public function __construct(SlotGeneratorService $slotService)
+    {
+        $this->slotService = $slotService;
+    }
+
+    private function generateDoctorSlots($doctorId, $date)
+    {
+        return $this->slotService->generate($doctorId, $date);
+    }
 
     // ── 1. CALENDRIER ────────────────────────────────────────────────────
     public function calendrier(Request $request)
@@ -41,10 +48,12 @@ class AppointmentController extends Controller
                     ->map(fn($d) => Carbon::parse($d)->format('H:i'))
                     ->toArray();
 
+                $availableSlots = $this->generateDoctorSlots($doctorId, $dateStr);
+
                 $calendar[$dateStr] = array_map(fn($c) => [
                     'heure'      => $c,
                     'disponible' => !in_array($c, $pris),
-                ], $this->creneaux);
+                ], $availableSlots);
             }
             $cursor->addDay();
         }
@@ -68,7 +77,8 @@ class AppointmentController extends Controller
                 ->pluck('appointment_date')
                 ->map(fn($d) => Carbon::parse($d)->format('H:i'))
                 ->toArray();
-            $creneauxDisponibles = array_values(array_filter($this->creneaux, fn($c) => !in_array($c, $pris)));
+            $availableSlots = $this->generateDoctorSlots($doctorId, $date);
+            $creneauxDisponibles = array_values(array_filter($availableSlots, fn($c) => !in_array($c, $pris)));
         }
 
         return view('rdv.prendre', compact('medecins', 'creneauxDisponibles', 'doctorId', 'date', 'preselectedHeure'));
@@ -163,7 +173,8 @@ class AppointmentController extends Controller
             ->map(fn($d) => Carbon::parse($d)->format('H:i'))
             ->toArray();
 
-        $creneauxDisponibles = array_values(array_filter($this->creneaux, fn($c) => !in_array($c, $pris)));
+        $availableSlots = $this->generateDoctorSlots($appointment->doctor_id, $date);
+        $creneauxDisponibles = array_values(array_filter($availableSlots, fn($c) => !in_array($c, $pris)));
         $medecins = User::where('role', 'medecin')->get();
 
         return view('rdv.modifier', compact('appointment', 'medecins', 'creneauxDisponibles', 'date'));
@@ -316,7 +327,8 @@ class AppointmentController extends Controller
                 ->pluck('appointment_date')
                 ->map(fn($d) => Carbon::parse($d)->format('H:i'))
                 ->toArray();
-            $creneauxDisponibles = array_values(array_filter($this->creneaux, fn($c) => !in_array($c, $pris)));
+            $availableSlots = $this->generateDoctorSlots($doctorId, $date);
+            $creneauxDisponibles = array_values(array_filter($availableSlots, fn($c) => !in_array($c, $pris)));
         }
 
         return view('rdv.prendre-secretaire', compact('medecins', 'patients', 'creneauxDisponibles', 'doctorId', 'date', 'preselectedHeure'));

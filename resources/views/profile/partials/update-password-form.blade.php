@@ -1,4 +1,5 @@
 
+
 <style>
 .dark input, .dark textarea, .dark select {
     background: #141e2e !important;
@@ -16,6 +17,7 @@
         </h2>
 
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+
             {{ __('Ensure your account is using a long, random password to stay secure.') }}
         </p>
     </header>

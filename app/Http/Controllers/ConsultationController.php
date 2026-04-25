@@ -46,11 +46,12 @@ class ConsultationController extends Controller
                 'medecin_id'  => auth()->user()->id,
             ]);
 
-            // C. Gestion de l'ordonnance (si tu as une table séparée ou un champ texte)
-            // Si c'est un champ "medicaments" dans la table consultations :
+            // C. Gestion de l'ordonnance
             if ($request->filled('medicaments')) {
-                $consultation->update([
-                    'medicaments' => $request->medicaments
+                \App\Models\Ordonnance::create([
+                    'consultation_id' => $consultation->id,
+                    'contenu'         => $request->medicaments,
+                    'date'            => now(),
                 ]);
             }
 
@@ -128,7 +129,7 @@ public function adminDashboard()
             'date'         => Carbon::parse($consultation->created_at)->format('d/m/Y'),
         ];
 
-        $pdf = PDF::loadView('consultations.ordonnance_pdf', $data);
+        $pdf = Pdf::loadView('consultations.ordonnance_pdf', $data);
         $fileName = 'ordonnance_' . strtolower($consultation->patient->nom) . '.pdf';
 
         return $pdf->stream($fileName);

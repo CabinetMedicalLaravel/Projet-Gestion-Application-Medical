@@ -17,10 +17,14 @@ class RegisteredUserController extends Controller
     /**
      * Les codes d'accès secrets par rôle.
      */
-    private array $accessCodes = [
-        'medecin'    => 'MEDECIN2026',      
-        'secretaire' => 'SECRETAIRE2026',   
-    ];
+    private function getAccessCodes(): array
+    {
+        return [
+            'medecin'    => env('ACCESS_CODE_MEDECIN', 'MEDECIN2026'),
+            'secretaire' => env('ACCESS_CODE_SECRETAIRE', 'SECRETAIRE2026'),
+            'admin'      => env('ACCESS_CODE_ADMIN', 'ADMIN2026'),
+        ];
+    }
 
     /**
      * Afficher la vue d'inscription.
@@ -32,9 +36,15 @@ class RegisteredUserController extends Controller
 
     /**
      * Traiter la demande d'inscription.
+
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request): RedirectResponse
     {
+        // Normaliser l'email avant la validation
+        $request->merge(['email' => strtolower($request->email)]);
+
         // ── 1. Validation ────────────────────────────────────────────────────
         $isPatient = $request->input('role', 'patient') === 'patient';
 
@@ -46,34 +56,38 @@ class RegisteredUserController extends Controller
             'access_code' => ['nullable', 'string', 'max:100'],
             'indicatif' => ['nullable', 'string', 'max:5'],
             'telephone' => [
-                $isPatient ? 'required' : 'nullable',
+                'required',
                 'string',
                 'max:20',
                 'regex:/^[0-9\s\-\.]+$/',
             ],
         ], [
-            'telephone.required' => 'Le numéro de téléphone est obligatoire pour les patients.',
+            'telephone.required' => 'Le numéro de téléphone est obligatoire.',
             'telephone.regex' => 'Le numéro de téléphone ne doit contenir que des chiffres.',
             'telephone.max' => 'Le numéro de téléphone est trop long.',
         ]);
 
         // ── 2. Détermination du rôle ─────────────────────────────────────────
         $role = 'patient';
+
         $submittedRole = $request->input('role', 'patient');
         $submittedCode = trim($request->input('access_code', ''));
 
         if ($submittedRole === 'staff' && filled($submittedCode)) {
             $matched = false;
+            $codes = $this->getAccessCodes();
 
-            foreach ($this->accessCodes as $roleName => $validCode) {
-                if ($submittedCode === $validCode) {
+            foreach ($codes as $roleName => $validCode) {
+                if (strtoupper($submittedCode) === strtoupper($validCode)) {
                     $role = $roleName;
                     $matched = true;
                     break;
                 }
             }
 
+
             if (!$matched) {
+
                 return back()
                     ->withInput($request->except('password', 'password_confirmation', 'access_code'))
                     ->withErrors(['access_code' => 'Le code d\'accès est incorrect. Veuillez contacter l\'administrateur.']);
@@ -82,7 +96,7 @@ class RegisteredUserController extends Controller
 
         // ── 3. Construction du numéro de téléphone complet ───────────────────
         $telephone = null;
-        if ($role === 'patient' && $request->filled('telephone')) {
+        if ($request->filled('telephone')) {
             $indicatif = $request->input('indicatif', '+212');
             $numero = preg_replace('/\s+/', '', $request->input('telephone'));
             $telephone = $indicatif . $numero;
@@ -90,6 +104,7 @@ class RegisteredUserController extends Controller
 
         // ── 4. Création de l'utilisateur ─────────────────────────────────────
         $user = User::create([
+
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
@@ -105,22 +120,26 @@ class RegisteredUserController extends Controller
                 'numero_bureau' => 'Non défini', // Valeur par défaut
             ]);
         }
-        // ──────────────────────────────────────────────────
-        // ── 5. Événement + connexion automatique ─────────────────────────────
-        event(new Registered($user));
+        // ─────────────────────────────────────────────────────────────────────────────
+        try {
+            event(new Registered($user));
+        } catch (\Exception $e) {
+            // On ignore l'erreur d'envoi d'email pour ne pas bloquer l'inscription
+            \Log::error("Erreur d'envoi d'email de vérification : " . $e->getMessage());
+        }
 
         Auth::login($user);
 
-        // ── 6. Redirection selon le rôle (MODIFIÉ) ───────────────────────────
+        // ── 6. Redirection avec vérification d'email ─────────────────────────
+        if (! $user->hasVerifiedEmail()) {
+            return redirect()->route('verification.notice');
+        }
+
         return match ($role) {
-            // Le médecin est envoyé vers la page pour compléter sa spécialité
             'medecin'    => redirect()->route('complete-profile.show'), 
-            
-            // La secrétaire va directement à son dashboard
             'secretaire' => redirect()->route('secretaire.dashboard'), 
-            
-            // Le patient va à son dashboard par défaut
             default      => redirect()->route('dashboard'),
         };
     }
 }
+

@@ -27,7 +27,7 @@
 
     <div class="info">
         <p style="float: right;"><strong>Date :</strong> {{ date('d/m/Y') }}</p>
-        <p><strong>Patient :</strong> {{ $consultation->patient->nom }} {{ $consultation->patient->prenom }}</p>
+        <p><strong>Patient :</strong> {{ $consultation->patient->name ?? 'Patient' }}</p>
     </div>
 
     <div class="prescription">

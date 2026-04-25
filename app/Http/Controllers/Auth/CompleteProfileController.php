@@ -48,8 +48,13 @@ class CompleteProfileController extends Controller
             'specialite' => $specialiteFinale,
         ]);
 
-        // 5. Redirection finale vers le dashboard du médecin
-        // Une fois redirigé, il aura accès à ses outils de médecin
+        // 5. Synchroniser aussi avec la table 'medecins' pour la cohérence des données
+        \App\Models\Medecin::updateOrCreate(
+            ['user_id' => $user->id],
+            ['specialite' => $specialiteFinale]
+        );
+
+        // 6. Redirection finale vers le dashboard du médecin
         return redirect()->route('medecin.dashboard')
                          ->with('status', 'Profil complété avec succès !');
     }

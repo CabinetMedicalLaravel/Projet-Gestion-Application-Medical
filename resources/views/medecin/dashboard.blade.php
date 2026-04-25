@@ -1,4 +1,5 @@
 <x-app-layout>
+
     <div class="py-8 bg-[#F0F4F8] min-h-screen font-sans text-gray-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -14,7 +15,7 @@
                             </div>
                         @endif
                         <div>
-                            <h1 class="text-3xl font-bold tracking-tight">Bonjour, Dr. {{ Auth::user()->name }} ! 👨‍⚕️</h1>
+                            <h1 class="text-3xl font-bold tracking-tight">Bonjour, Dr. {{ Auth::user()->name }} !</h1>
                             <p class="text-blue-100 mt-1 opacity-90 font-medium italic">
                                 Spécialité : {{ Auth::user()->specialite ?? 'Généraliste' }}
                             </p>
@@ -86,43 +87,67 @@
                 <div class="lg:col-span-2 space-y-8">
 
                     <!-- RDV du jour -->
-                    <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
-                        <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-[#F8FAFC]">
-                            <h2 class="text-lg font-black text-[#0D47A1] flex items-center">
+                    <div class="bg-white dark:bg-[#1e293b] rounded-[2rem] shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden" 
+                         x-data="{ 
+                            rdvs: {{ json_encode($rdvAujourdhui) }},
+                            loading: false,
+                            fetchRdvs() {
+                                this.loading = true;
+                                fetch('{{ route('medecin.api.rdv') }}')
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        this.rdvs = data;
+                                        this.loading = false;
+                                    });
+                            }
+                         }"
+                         x-init="setInterval(() => fetchRdvs(), 30000)">
+                        <div class="px-8 py-6 border-b border-gray-50 dark:border-slate-700 flex justify-between items-center bg-[#F8FAFC] dark:bg-slate-800/50">
+                            <h2 class="text-lg font-black text-[#0D47A1] dark:text-blue-400 flex items-center">
                                 <span class="w-2 h-6 bg-[#1976D2] rounded-full mr-3"></span>
                                 Prochaines consultations
+                                <template x-if="loading">
+                                    <span class="ml-3 flex h-2 w-2">
+                                        <span class="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-blue-400 opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                                    </span>
+                                </template>
                             </h2>
-                            <button class="text-[#1976D2] text-sm font-bold hover:underline">Agenda complet</button>
+                            <a href="{{ route('rdv.planning') }}" class="text-[#1976D2] dark:text-blue-400 text-sm font-bold hover:underline">Agenda complet</a>
                         </div>
 
                         <div class="p-8 space-y-4">
-                            @forelse ($rdvAujourdhui ?? [] as $rdv)
-                                <div class="flex items-center justify-between p-4 rounded-2xl border border-transparent hover:border-[#BBDEFB] hover:bg-[#F1F8FE] transition-all group">
-                                    <div class="flex items-center gap-5">
-                                        <div class="bg-white text-[#1976D2] px-4 py-2 rounded-xl text-sm font-black shadow-sm border border-blue-50 group-hover:bg-[#1976D2] group-hover:text-white transition-all">
-                                            {{ $rdv['heure'] }}
+                            <template x-if="rdvs.length > 0">
+                                <template x-for="rdv in rdvs" :key="rdv.heure + rdv.patient">
+                                    <div class="flex items-center justify-between p-4 rounded-2xl border border-transparent hover:border-[#BBDEFB] dark:hover:border-slate-600 hover:bg-[#F1F8FE] dark:hover:bg-slate-800 transition-all group">
+                                        <div class="flex items-center gap-5">
+                                            <div class="bg-white dark:bg-slate-700 text-[#1976D2] dark:text-blue-300 px-4 py-2 rounded-xl text-sm font-black shadow-sm border border-blue-50 dark:border-slate-600 group-hover:bg-[#1976D2] group-hover:text-white transition-all" x-text="rdv.heure">
+                                            </div>
+                                            <div>
+                                                <p class="font-black text-gray-900 dark:text-white text-base" x-text="rdv.patient"></p>
+                                                <p class="text-gray-400 dark:text-slate-500 text-xs font-bold uppercase" x-text="rdv.motif || 'Consultation'"></p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p class="font-black text-gray-900 text-base">{{ $rdv['patient'] }}</p>
-                                            <p class="text-gray-400 text-xs font-bold uppercase">{{ $rdv['motif'] ?? 'Consultation' }}</p>
+                                        <div class="flex items-center gap-4">
+                                            <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter" 
+                                                  :class="rdv.statut === 'confirmé' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'"
+                                                  x-text="rdv.statut">
+                                            </span>
+
                                         </div>
                                     </div>
-                                    <div class="flex items-center gap-4">
-                                        <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter {{ $rdv['statut'] === 'confirmé' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700' }}">
-                                            {{ $rdv['statut'] }}
-                                        </span>
-                                        <button class="text-gray-300 hover:text-[#1E88E5]"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg></button>
-                                    </div>
-                                </div>
-                            @empty
+                                </template>
+                            </template>
+                            <template x-if="rdvs.length === 0">
                                 <div class="text-center py-12">
-                                    <p class="text-gray-400 font-bold italic">Aucune consultation aujourd'hui.</p>
+                                    <p class="text-gray-400 dark:text-slate-500 font-bold italic">Aucun rendez-vous à venir.</p>
                                 </div>
-                            @endforelse
+                            </template>
                         </div>
                     </div>
 
                     <!-- Derniers patients -->
+
                     <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8">
                         <h2 class="text-lg font-black text-[#0D47A1] mb-6 flex items-center">
                             <span class="w-2 h-6 bg-[#1565C0] rounded-full mr-3"></span>
@@ -133,16 +158,16 @@
                                 <div class="flex items-center justify-between p-4 bg-[#F8FAFC] rounded-2xl hover:bg-white hover:shadow-md transition-all border border-transparent hover:border-[#90CAF9]">
                                     <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1565C0] to-[#1E88E5] text-white flex items-center justify-center font-black text-sm">
-                                            {{ strtoupper(substr($patient['nom'], 0, 1)) }}
+                                            {{ strtoupper(substr($patient->name, 0, 1)) }}
                                         </div>
                                         <div>
-                                            <p class="font-black text-gray-800 text-sm leading-tight">{{ $patient['nom'] }}</p>
-                                            <p class="text-[10px] text-gray-400 font-bold uppercase mt-1">{{ $patient['date_derniere_visite'] }}</p>
+                                            <p class="font-black text-gray-800 text-sm leading-tight">{{ $patient->name }}</p>
+                                            <p class="text-[10px] text-gray-400 font-bold uppercase mt-1">
+                                                Dernière visite : {{ $patient->consultationsAsPatient->first()?->created_at->format('d/m/Y') ?? 'Inconnue' }}
+                                            </p>
                                         </div>
                                     </div>
-                                    <a href="#" class="p-2 bg-white text-[#1976D2] rounded-lg shadow-sm hover:bg-[#1976D2] hover:text-white transition-colors">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                    </a>
+
                                 </div>
                             @empty
                                 <p class="text-gray-400 text-xs italic font-bold">Historique vide.</p>
@@ -159,48 +184,21 @@
                     <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8">
                         <h2 class="text-lg font-black text-[#0D47A1] mb-6 tracking-tight">Raccourcis</h2>
                         <div class="grid grid-cols-1 gap-4">
-                            <a href="#" class="flex items-center p-4 bg-[#F1F8FE] rounded-2xl border border-[#BBDEFB] group hover:bg-[#1976D2] transition-all duration-300">
+                            <a href="{{ route('rdv.planning') }}" class="flex items-center p-4 bg-[#F1F8FE] rounded-2xl border border-[#BBDEFB] group hover:bg-[#1976D2] transition-all duration-300 shadow-sm">
                                 <div class="bg-white p-3 rounded-xl shadow-sm group-hover:scale-110 transition-transform">
                                     <svg class="w-6 h-6 text-[#1976D2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                 </div>
                                 <div class="ml-4 text-sm font-black text-[#0D47A1] group-hover:text-white transition">Agenda complet</div>
                             </a>
-<<<<<<< HEAD
-<<<<<<< HEAD
-                            <a href="{{ url('/consultation/create/' . $patient->id) }}" class="block bg-[#F8F7F4] rounded-xl p-4 hover:bg-gray-100 transition">
-                                <div class="bg-white w-8 h-8 rounded-lg shadow-sm flex items-center justify-center mb-3">
-                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-=======
-                            <a href="#"
-                                class="block bg-[#F8F7F4] dark:bg-gray-700 rounded-xl p-4 hover:bg-gray-100 dark:hover:bg-gray-600 transition">
-                                <div
-                                    class="bg-white dark:bg-gray-800 w-8 h-8 rounded-lg shadow-sm flex items-center justify-center mb-3">
-                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
->>>>>>> c786c016ab5bdb026b76331043925fce08a52a25
-=======
-
-                            <a href="#" class="flex items-center p-4 bg-[#E3F2FD] rounded-2xl border border-[#90CAF9] group hover:bg-[#1565C0] transition-all duration-300 shadow-sm">
+                             <a href="{{ route('consultation.create') }}" class="flex items-center p-4 bg-[#F8F7F4] rounded-2xl border border-gray-100 group hover:bg-gray-200 transition-all duration-300 shadow-sm">
                                 <div class="bg-white p-3 rounded-xl shadow-sm group-hover:scale-110 transition-transform">
-                                    <svg class="w-6 h-6 text-[#1565C0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
->>>>>>> 1a9fef19a87a0a690b3701666bf2609ac82c8e3b
+                                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                 </div>
-                                <div class="ml-4 text-sm font-black text-[#0D47A1] group-hover:text-white transition">Ordonnances</div>
-                            </a>
-
-                            <a href="#" class="flex items-center p-4 bg-[#F0F7FF] rounded-2xl border border-[#1E88E5]/20 group hover:bg-[#1E88E5] transition-all duration-300 shadow-sm">
-                                <div class="bg-white p-3 rounded-xl shadow-sm group-hover:scale-110 transition-transform">
-                                    <svg class="w-6 h-6 text-[#1E88E5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                                    </svg>
-                                </div>
-                                <div class="ml-4 text-sm font-black text-[#0D47A1] group-hover:text-white transition">Statistiques</div>
+                                <div class="ml-4 text-sm font-black text-gray-700 transition">Créer Ordonnance</div>
                             </a>
                         </div>
                     </div>
+
 
                     <!-- Activité (Timeline Bleue) -->
                     <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8">
@@ -232,6 +230,7 @@
                             </p>
                         </div>
                         <div class="absolute -bottom-6 -right-6 w-24 h-24 bg-white/5 rounded-full"></div>
+
                     </div>
                 </div>
 
@@ -239,3 +238,4 @@
         </div>
     </div>
 </x-app-layout>
+

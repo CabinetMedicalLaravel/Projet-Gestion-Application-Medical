@@ -1,21 +1,22 @@
+
 <x-app-layout>
     <!-- On définit les couleurs personnalisées en haut pour plus de clarté -->
-    <div class="py-8 bg-[#F0F4F8] min-h-screen font-sans text-gray-900">
+    <div class="py-8 bg-[#F0F4F8] dark:bg-[#0f172a] min-h-screen font-sans text-gray-900 dark:text-gray-100 transition-colors duration-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
             <!-- MESSAGE DE SUCCÈS -->
             @if(session('success'))
-                <div class="mb-6 p-4 bg-[#E3F2FD] border border-[#2196F3] text-[#0D47A1] rounded-2xl font-bold flex items-center shadow-sm">
+                <div class="mb-6 p-4 bg-[#E3F2FD] dark:bg-blue-900/20 border border-[#2196F3] dark:border-blue-800 text-[#0D47A1] dark:text-blue-300 rounded-2xl font-bold flex items-center shadow-sm">
                     <svg class="w-5 h-5 mr-3 text-[#1976D2]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
                     {{ session('success') }}
                 </div>
             @endif
 
             <!-- EN-TÊTE AVEC BANNIÈRE DYNAMIQUE (DÉGRADÉ BLEU PRO) -->
-            <div class="relative bg-gradient-to-r from-[#0D47A1] via-[#1565C0] to-[#1976D2] rounded-3xl p-8 mb-8 text-white shadow-xl overflow-hidden">
+            <div class="relative bg-gradient-to-r from-[#0D47A1] via-[#1565C0] to-[#1976D2] dark:from-[#1e293b] dark:to-[#0f172a] rounded-3xl p-8 mb-8 text-white shadow-xl overflow-hidden border border-transparent dark:border-slate-700">
                 <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between">
                     <div>
-                        <h1 class="text-3xl font-bold tracking-tight">Bonjour, {{ Auth::user()->name }} ! 👋</h1>
+                        <h1 class="text-3xl font-bold tracking-tight">Bonjour, {{ Auth::user()->name }} !</h1>
                         <p class="text-blue-50 mt-2 opacity-90 font-medium">
                             {{ \Carbon\Carbon::now()->translatedFormat('l d F Y') }} — Votre santé, notre priorité.
                         </p>
@@ -62,25 +63,10 @@
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                         </div>
                     </div>
-                    <p class="text-3xl font-black text-[#0D47A1]">{{ count($rdv) }}</p>
+                    <p class="text-3xl font-black text-[#0D47A1]">{{ $totalRdv }}</p>
                     <p class="text-gray-400 text-xs font-bold mt-1 uppercase tracking-tighter">Historique complet</p>
                 </div>
-<<<<<<< HEAD
-                <!-- Bloc 3 -->
-<<<<<<< HEAD
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <span class="text-gray-400 text-sm">Ordonnances</span>
-                <h3 class="text-3xl font-bold mt-2">
-                  {{ count($ordonnances ?? []) }}
-                </h3>
-                      <p class="text-xs text-gray-400 mt-1">téléchargeables</p>
-                 </div>
-=======
-                <div class="bg-[#F8F7F4] dark:bg-gray-800 rounded-2xl p-6">
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Ordonnances</p>
-                    <p class="text-3xl font-semibold text-gray-900 dark:text-gray-100 mb-1">{{ $nbOrdonnances }}</p>
-                    <p class="text-gray-500 dark:text-gray-400 text-sm">téléchargeables</p>
-=======
+
 
                 <!-- Ordonnances -->
                 <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all border-l-4 border-[#2196F3]">
@@ -92,9 +78,7 @@
                     </div>
                     <p class="text-3xl font-black text-[#0D47A1]">{{ $nbOrdonnances }}</p>
                     <p class="text-gray-400 text-xs font-bold mt-1 uppercase tracking-tighter">disponibles</p>
->>>>>>> 1a9fef19a87a0a690b3701666bf2609ac82c8e3b
                 </div>
->>>>>>> c786c016ab5bdb026b76331043925fce08a52a25
             </div>
 
             <!-- SECTION 2 : CONTENU PRINCIPAL -->
@@ -106,7 +90,7 @@
                     <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
                         <div class="px-8 py-6 border-b border-gray-50 bg-[#F8FAFC] flex justify-between items-center">
                             <h2 class="text-lg font-black text-[#0D47A1]">Mes prochains rendez-vous</h2>
-                            <button class="text-[#1976D2] text-sm font-black hover:text-[#0D47A1] uppercase tracking-tight transition">Voir tout</button>
+                            <a href="{{ route('rdv.mes-rdv') }}" class="text-[#1976D2] text-sm font-black hover:text-[#0D47A1] uppercase tracking-tight transition">Voir tout</a>
                         </div>
                         <div class="p-8">
                             <div class="space-y-4">
@@ -166,7 +150,7 @@
                     <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8">
                         <h2 class="text-lg font-black text-[#0D47A1] mb-6 tracking-tighter">Raccourcis</h2>
                         <div class="grid grid-cols-1 gap-4">
-                            <a href="#" class="flex items-center p-4 bg-[#F1F8FE] rounded-2xl border border-[#BBDEFB] group hover:bg-[#1976D2] transition-all duration-300 shadow-sm">
+                            <a href="{{ route('rdv.create') }}" class="flex items-center p-4 bg-[#F1F8FE] rounded-2xl border border-[#BBDEFB] group hover:bg-[#1976D2] transition-all duration-300 shadow-sm">
                                 <div class="bg-white p-3 rounded-xl shadow-sm group-hover:scale-110 transition-transform">
                                     <svg class="w-6 h-6 text-[#1976D2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                                 </div>
@@ -175,7 +159,7 @@
                                 </div>
                             </a>
 
-                            <a href="#" class="flex items-center p-4 bg-[#E3F2FD] rounded-2xl border border-[#90CAF9] group hover:bg-[#1565C0] transition-all duration-300 shadow-sm">
+                            <a href="{{ route('patient.dossier') }}" class="flex items-center p-4 bg-[#E3F2FD] rounded-2xl border border-[#90CAF9] group hover:bg-[#1565C0] transition-all duration-300 shadow-sm">
                                 <div class="bg-white p-3 rounded-xl shadow-sm group-hover:scale-110 transition-transform">
                                     <svg class="w-6 h-6 text-[#1565C0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                 </div>

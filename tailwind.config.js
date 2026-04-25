@@ -3,29 +3,34 @@ import forms from '@tailwindcss/forms';
 
 /** @type {import('tailwindcss').Config} */
 export default {
+
     darkMode: 'class',
     content: [
-    "./resources/**/*.blade.php", // C'est cette ligne qui est CRUCIALE
-    "./resources/**/*.js",
-    "./resources/**/*.vue",
-  ],
+        "./resources/**/*.blade.php",
+        "./resources/**/*.js",
+        "./resources/**/*.vue",
+        './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
+        './storage/framework/views/*.php',
+        './resources/views/**/*.blade.php',
+    ],
     theme: {
         extend: {
             colors: {
                 dental: {
-                    'dark': '#0D47A1',   // Bleu Marine (Titres)
-                    'main': '#1976D2',   // Bleu Royal (Boutons)
-                    'accent': '#1E88E5', // Bleu Vif (Hover)
-                    'light': '#2196F3',  // Bleu Ciel (Badges)
-                    'soft': '#1565C0',   // Bleu Intermédiaire
+                    'dark': '#0D47A1',
+                    'main': '#1976D2',
+                    'accent': '#1E88E5',
+                    'light': '#2196F3',
+                    'soft': '#1565C0',
                 },
             },
+            fontFamily: {
+                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+            },
             maxWidth: {
-                'card-lg': '900px', // ← ajoute (utilisé dans prendre.blade)
+                'card-lg': '900px',
             },
         },
     },
-
     plugins: [forms],
-
 };
