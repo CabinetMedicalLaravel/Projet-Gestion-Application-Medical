@@ -1,0 +1,15 @@
+{
+  "$schema": "https://schema.railpack.com",
+  "packages": {
+    "php": "8.2"
+  },
+  "buildAptPackages": [
+    "libxml2-dev",
+    "libcurl4-openssl-dev",
+    "libzip-dev",
+    "libonig-dev"
+  ],
+  "deploy": {
+    "startCommand": "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT"
+  }
+}
